@@ -2,6 +2,8 @@ package cs4620.mesh;
 
 import java.util.ArrayList;
 
+import org.lwjgl.BufferUtils;
+
 import egl.math.Vector3;
 import egl.math.Vector3i;
 
@@ -36,6 +38,31 @@ public class MeshConverter {
 	public static MeshData convertToVertexNormals(ArrayList<Vector3> positions, ArrayList<Vector3i> tris) {
 		MeshData data = new MeshData();
 
+		//Calculate Vertex and Index Count
+		data.vertexCount = positions.size();
+		data.indexCount = tris.size() * 3;
+		
+		//Create Storage Space
+		data.positions = BufferUtils.createFloatBuffer(data.vertexCount * 3);
+		data.normals = BufferUtils.createFloatBuffer(data.vertexCount * 3);
+		data.uvs = BufferUtils.createFloatBuffer(data.vertexCount * 2);
+		data.indices = BufferUtils.createIntBuffer(data.indexCount);
+		
+		//Add Vertices
+		for(Vector3 v : positions){
+			data.positions.put(v.x); data.positions.put(v.y); data.positions.put(v.z);
+		}
+		
+		//Construct Normals
+		//loop through triangles, loop through vertices, take a weighted face-vector average around a vertex?
+		
+		//Construct UVs
+		
+		//Add Indices
+		for(Vector3i v : tris){
+			data.indices.put(v.x * 3); data.indices.put(v.y * 3); data.indices.put(v.z * 3);
+		}
+		
 		// TODO#A1: Allocate mesh data and create mesh positions, normals, and indices (Remember to set mesh Vertex/Index counts)
 		// Note that the vertex data has been supplied as a list of egl.math.Vector3 objects.  Take a
 		// look at that class, which contains methods that are very helpful for performing vector

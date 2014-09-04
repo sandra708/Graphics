@@ -21,6 +21,8 @@ public class MeshGenCylinder extends MeshGenerator {
 
 		// Create Storage Spaces
 		outData.positions = BufferUtils.createFloatBuffer(outData.vertexCount * 3);
+		outData.uvs = BufferUtils.createFloatBuffer(outData.vertexCount * 2);
+		outData.normals = BufferUtils.createFloatBuffer(outData.vertexCount * 3);
 		outData.indices = BufferUtils.createIntBuffer(outData.indexCount);
 		
 		// Create The Vertices
@@ -47,6 +49,28 @@ public class MeshGenCylinder extends MeshGenerator {
 		outData.positions.put(0); outData.positions.put(1); outData.positions.put(-1);
 		
 		outData.positions.put(0); outData.positions.put(-1); outData.positions.put(-1);
+		
+		//Create the Normals 
+		for(int i = 0; i < opt.divisionsLongitude; i++){
+			//Calculate the XZ-plane position
+			float p = (float)i / (float)opt.divisionsLongitude;
+			double theta = p * Math.PI * 2.0;
+			float z = (float)-Math.cos(theta);
+			float x = (float)-Math.sin(theta);
+			
+			//Tube
+			outData.normals.put(x); outData.normals.put(0); outData.normals.put(z);
+			outData.normals.put(x); outData.normals.put(0); outData.normals.put(z);
+			
+			//Cap
+			outData.normals.put(0); outData.normals.put(1); outData.normals.put(0);
+			outData.normals.put(0); outData.normals.put(-1); outData.normals.put(0);
+		} 
+		//For the extra vertices at U = 1
+		outData.normals.put(0); outData.normals.put(1); outData.normals.put(0);
+		outData.normals.put(0); outData.normals.put(-1); outData.normals.put(0);
+		
+		//Create UVs
 		
 		// Create The Indices For The Tube
 		for(int i = 0;i < opt.divisionsLongitude;i++) {
