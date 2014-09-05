@@ -54,7 +54,24 @@ public class MeshConverter {
 		}
 		
 		//Construct Normals
-		//loop through triangles, loop through vertices, take a weighted face-vector average around a vertex?
+		Vector3[] normals = new Vector3[data.vertexCount];
+		for(int i = 0; i < normals.length; i++){
+			normals[i] = new Vector3();
+		}
+		for(Vector3i tri : tris){
+			Vector3 x = positions.get(tri.x);
+			Vector3 y = positions.get(tri.y);
+			Vector3 normal = x.clone().cross(y);
+			if(!normal.equalsApprox(new Vector3(0))){
+				normals[tri.x].add(normal);
+				normals[tri.y].add(normal);
+				normals[tri.z].add(normal);
+			}
+		}
+		for(Vector3 nv : normals){
+			nv.normalize();
+			data.normals.put(nv.x); data.normals.put(nv.y); data.normals.put(nv.z);
+		}
 		
 		//Construct UVs
 		
