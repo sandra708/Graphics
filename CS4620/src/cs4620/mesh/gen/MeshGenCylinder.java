@@ -74,20 +74,20 @@ public class MeshGenCylinder extends MeshGenerator {
 		for(int i = 0; i < opt.divisionsLongitude; i++){
 			float p = (float)i / (float)opt.divisionsLongitude;
 			double theta = p * Math.PI * 2.0;
-			float u = (float) (-Math.cos(theta) * 0.5);
-			float v = (float) (-Math.sin(theta) * 0.5 + 0.5);
+			float u = (float) (-Math.cos(theta) * 0.25 + 0.25);
+			float v = (float) (Math.sin(theta) * 0.25 + 0.75);
 			
 			//Tube
-			outData.uvs.put(p); outData.uvs.put(0);
 			outData.uvs.put(p); outData.uvs.put((float) 0.5);
+			outData.uvs.put(p); outData.uvs.put(0);
 			
 			//Caps
 			outData.uvs.put((float) (u + 0.5)); outData.uvs.put(v);
 			outData.uvs.put(u); outData.uvs.put(v);
 		}
 		//Extra Vertices
-		outData.uvs.put(0); outData.uvs.put(0);
-		outData.uvs.put(0); outData.uvs.put((float) 0.5);
+		outData.uvs.put(1); outData.uvs.put((float) 0.5);
+		outData.uvs.put(1); outData.uvs.put(0);
 		
 		// Create The Indices For The Tube
 		for(int i = 0;i < opt.divisionsLongitude;i++) {
