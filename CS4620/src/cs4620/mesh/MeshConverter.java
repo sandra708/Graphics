@@ -45,7 +45,6 @@ public class MeshConverter {
 		//Create Storage Space
 		data.positions = BufferUtils.createFloatBuffer(data.vertexCount * 3);
 		data.normals = BufferUtils.createFloatBuffer(data.vertexCount * 3);
-		data.uvs = BufferUtils.createFloatBuffer(data.vertexCount * 2);
 		data.indices = BufferUtils.createIntBuffer(data.indexCount);
 		
 		//Add Vertices
@@ -61,7 +60,10 @@ public class MeshConverter {
 		for(Vector3i tri : tris){
 			Vector3 x = positions.get(tri.x);
 			Vector3 y = positions.get(tri.y);
-			Vector3 normal = x.clone().cross(y);
+			Vector3 z = positions.get(tri.z);
+			Vector3 fst = x.clone().sub(y);
+			Vector3 snd = x.clone().sub(z);
+			Vector3 normal = fst.cross(snd);
 			if(!normal.equalsApprox(new Vector3(0))){
 				normals[tri.x].add(normal);
 				normals[tri.y].add(normal);
@@ -73,11 +75,9 @@ public class MeshConverter {
 			data.normals.put(nv.x); data.normals.put(nv.y); data.normals.put(nv.z);
 		}
 		
-		//Construct UVs
-		
 		//Add Indices
 		for(Vector3i v : tris){
-			data.indices.put(v.x * 3); data.indices.put(v.y * 3); data.indices.put(v.z * 3);
+			data.indices.put(v.x); data.indices.put(v.y); data.indices.put(v.z);
 		}
 		
 		// TODO#A1: Allocate mesh data and create mesh positions, normals, and indices (Remember to set mesh Vertex/Index counts)

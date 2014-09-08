@@ -45,9 +45,9 @@ public class MeshGenSphere extends MeshGenerator {
 		
 		//Create the UVs
 		for(int i = 0; i < opt.divisionsLatitude + 1; i++){
-			float u = (float) i / (float) opt.divisionsLatitude;
+			float v = (float) i / (float) opt.divisionsLatitude;
 			for(int j = 0; j < opt.divisionsLongitude + 1; j++){
-				float v = (float) j / (float) opt.divisionsLongitude;
+				float u = (float) j / (float) opt.divisionsLongitude;
 				outData.uvs.put(u); outData.uvs.put(v); 
 			}
 		}
