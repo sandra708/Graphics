@@ -23,25 +23,46 @@ public class MeshGenTorus extends MeshGenerator {
 		outData.uvs = BufferUtils.createFloatBuffer(outData.vertexCount * 2);
 		outData.indices = BufferUtils.createIntBuffer(outData.indexCount);
 		
-		//Vertex Positions
+		//Torus Geometry
+		float rInner = (1 - opt.innerRadius) / 2;
+		float rOuter = 1 - rInner;
+		
+		//Vertex Positions and Normals
 		for(int i = 0; i < opt.divisionsLatitude + 1; i++){
 			float p = (float) i / (float) opt.divisionsLatitude;
 			double theta = p * Math.PI * 2;
-			float r = 1 - opt.innerRadius;
-			float y = (float) (Math.sin(theta) * r);
+			float y = (float) (Math.sin(theta) * rInner);
+			float r = (float) (rOuter - Math.cos(theta) * rInner); 
+			
+			float ny = y;
+			float nr = (float) (-Math.cos(theta) * rInner);
+			
 			for(int j = 0; j < opt.divisionsLongitude + 1; j++){
 				float q = (float) j / (float) opt.divisionsLongitude;
 				double phi = q * Math.PI * 2;
-				float x = (float) (Math.cos(theta) * r + Math.sin(phi));
-				float z = (float) (Math.cos(theta) * r + Math.cos(phi));
 				
+				//Positions
+				float x = (float) (Math.sin(phi) * r);
+				float z = (float) (-Math.cos(phi) * r);
+	
 				outData.positions.put(x); outData.positions.put(y); outData.positions.put(z);
+				
+				//Normals
+				float nx = (float) (Math.sin(phi) * nr);
+				float nz = (float) (-Math.cos(phi) * nr);
+				
+				outData.normals.put(nx); outData.normals.put(ny); outData.normals.put(nz);
 			}
  		}
 		
-		//Vertex Normals
-		
-		//UVs
+		//Create the UVs
+		for(int i = 0; i < opt.divisionsLatitude + 1; i++){
+			float v = (float) 1 - i / (float) opt.divisionsLatitude;
+			for(int j = 0; j < opt.divisionsLongitude + 1; j++){
+				float u = (float) 1 - j / (float) opt.divisionsLongitude;
+				outData.uvs.put(u); outData.uvs.put(v); 
+			}
+		}
 		
 		//Indices
 		for(int i = 0; i < opt.divisionsLatitude; i++){
