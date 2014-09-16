@@ -34,9 +34,20 @@ public class Sphere extends Surface {
    * @return true if the surface intersects the ray
    */
   public boolean intersect(IntersectionRecord outRecord, Ray rayIn) {
-    // TODO#A2: fill in this function.
-	  
-    return false;
+    Vector3d hyp = center.clone().sub(rayIn.origin);
+    Vector3d adj = rayIn.direction.clone().normalize().mul(hyp.dot(rayIn.direction));
+    Vector3d opp = adj.clone().sub(hyp);
+    if(opp.len() > radius) return false;
+    double adjLen = Math.pow(radius, 2) - opp.lenSq();
+    Vector3d adjShort = adj.clone().normalize().mul(adj.len() - adjLen);
+    Vector3d intersect = rayIn.origin.clone().add(adjShort);
+    Vector3d norm = adj.clone().mul(-adjLen).add(opp);
+	outRecord.location.set(intersect);
+	outRecord.normal.set(norm);
+	outRecord.surface = this;
+	outRecord.t = adjShort.len() / rayIn.direction.len();
+	
+    return true;
   }
   
   /**
