@@ -100,7 +100,7 @@ public class Triangle extends Surface {
     Vector3d alpha = (new Vector3d(normA)).mul(1 - dets[0] - dets[1]);
     Vector3d beta = (new Vector3d(normB)).mul(dets[0]);
     Vector3d gamma = (new Vector3d(normC)).mul(dets[1]);
-    outRecord.normal.set(new Vector3d(alpha)).add(beta).add(gamma);
+    outRecord.normal.set(new Vector3d(alpha)).add(beta).add(gamma).normalize();
     
     Vector2d textA = owner.getUV(index.x);
     Vector2d textB = owner.getUV(index.y);
@@ -112,6 +112,9 @@ public class Triangle extends Surface {
     outRecord.texCoords.set(new Vector2d(alphaUV)).add(betaUV).add(gammaUV);
     
 	return true;
+	
+	//TODO#A2 remember that rays can have ending points!
+	//check if textures are available
   }
 
   /**

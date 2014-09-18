@@ -46,6 +46,7 @@ public class Sphere extends Surface {
 	outRecord.normal.set(norm);
 	outRecord.surface = this;
 	outRecord.t = adjShort.len() / rayIn.direction.len();
+	//TODO#A2 : no textures
 	
     return true;
   }

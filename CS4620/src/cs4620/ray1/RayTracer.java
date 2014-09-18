@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import cs4620.ray1.camera.Camera;
+import cs4620.ray1.shader.Shader;
 import cs4620.ray1.surface.Surface;
 import egl.math.Colord;
 
@@ -238,12 +239,23 @@ public class RayTracer {
 	 * @param ray the ray to shade
 	 */
 	public static void shadeRay(Colord outColor, Scene scene, Ray ray) {
+		IntersectionRecord outRecord = new IntersectionRecord();
+		boolean intersect = scene.getFirstIntersection(outRecord, ray);
+		if(intersect){
+			Shader s = outRecord.surface.getShader();
+			s.shade(outColor, scene, ray, outRecord);
+			
+		}else
+			outColor.set(scene.backColor);
+		
 		// TODO#A2: Compute the color of the intersection point.
 		// 1) Find the first intersection of "ray" with the scene.
 		//    Record intersection in intersectionRecord. If it doesn't hit anything,
 		//    just return the scene's background color.
 		// 2) Get the shader from the intersection record.
 		// 3) Call the shader's shade() method to set the color for this ray.
+		
+		//I think this is done
 		
 	}
 }
