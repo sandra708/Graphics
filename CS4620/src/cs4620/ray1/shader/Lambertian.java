@@ -47,18 +47,18 @@ public class Lambertian extends Shader {
 		} else {
 			hue.set(getTexture().getTexColor(record.texCoords));
 		}
-		
 		outIntensity.set(0);
 		for(Light light : scene.getLights()){
 			Vector3d toLight = (new Vector3d(light.position).sub(record.location));
-			Ray shadowRay = new Ray(new Vector3d(record.location), toLight.normalize());
+			double len = toLight.len();
+			Ray shadowRay = new Ray();
+			shadowRay.makeOffsetSegment(len);
 			if(!isShadowed(scene, light, record, shadowRay)){
-				Vector3d l = new Vector3d(toLight).normalize();
-				Vector3d n = new Vector3d(record.normal).normalize();
+				Vector3d l = new Vector3d(toLight);
+				Vector3d n = (new Vector3d(record.normal)).normalize();
 				double theta = Math.max(0, l.dot(n));
-				double r = toLight.x / l.x;
-				double lambert = theta * (1 / Math.pow(r, 2));
-				Vector3d color = (new Colord(hue)).mul(lambert);
+				double lambert = theta / Math.pow(len, 2);
+				Vector3d color = hue.mul(lambert).mul(light.intensity);
 				outIntensity.add(color);
 			}
 		}

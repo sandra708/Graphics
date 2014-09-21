@@ -1,5 +1,8 @@
 package cs4620.ray1.shader;
 
+import java.awt.image.Raster;
+
+import egl.math.Color;
 import egl.math.Colord;
 import egl.math.Vector2d;
 
@@ -17,6 +20,20 @@ public class RepeatTexture extends Texture {
 			System.err.println("Warning: Texture uninitialized!");
 			return new Colord();
 		}
+		
+		double x = texCoord.x;
+		
+		double y = texCoord.y;
+		
+		Raster pixels = image.getRaster();
+		int width = pixels.getWidth();
+		int height = pixels.getHeight();
+		
+		int i = (int) ((x * width + 0.5) % width) + pixels.getMinX();
+		int j = (int) ((height - y * height + 0.5) % height) + pixels.getMinY();
+		int rgb = image.getRGB(i, j); //ArrayIndexOutOfBounds - teapot, 28%
+		
+		Colord outColor = new Colord(Color.fromIntRGB(rgb));
 				
 		// TODO#A2: Fill in this function.
 		// 1) Convert the input texture coordinates to integer pixel coordinates. Adding 0.5
@@ -28,7 +45,7 @@ public class RepeatTexture extends Texture {
 		// NOTE: By convention, UV coordinates specify the lower-left corner of the image as the
 		//    origin, but the ImageBuffer class specifies the upper-left corner as the origin.
 			
-		return new Colord();
+		return outColor;
 	}
 
 }

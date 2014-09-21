@@ -42,12 +42,27 @@ public class Sphere extends Surface {
     Vector3d adjShort = adj.clone().normalize().mul(adj.len() - adjLen);
     Vector3d intersect = rayIn.origin.clone().add(adjShort);
     Vector3d norm = adj.clone().mul(-adjLen).add(opp);
+    norm.normalize();
+    
 	outRecord.location.set(intersect);
 	outRecord.normal.set(norm);
 	outRecord.surface = this;
 	outRecord.t = adjShort.len() / rayIn.direction.len();
-	//TODO#A2 : no textures
 	
+	double phi = norm.angle(new Vector3d(0, 1, 0));
+	Vector3d normHoriz = (new Vector3d()).set(norm.x, 0, norm.z);
+	double theta1 = normHoriz.angle(new Vector3d(0, 0, -1));
+	double theta2 = normHoriz.angle(new Vector3d(1, 0, 0));
+	double theta;
+	
+	if(theta2 < Math.PI/2){
+		theta = theta1;
+	}else{
+		theta = theta1 + Math.PI;
+	}
+	
+    outRecord.texCoords.set(phi / Math.PI, theta / (Math.PI * 2));
+    
     return true;
   }
   

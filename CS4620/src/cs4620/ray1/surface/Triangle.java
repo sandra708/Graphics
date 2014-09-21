@@ -61,8 +61,8 @@ public class Triangle extends Surface {
    * @return true if the surface intersects the ray
    */
   public boolean intersect(IntersectionRecord outRecord, Ray rayIn) {
-    Vector3d trinorm = (new Vector3d(a, b, c)).cross(new Vector3d(d, e, f));
-    if(trinorm.dot(rayIn.direction) < 1e-8) return false;
+    Vector3d trinorm = (new Vector3d(a, b, c)).cross(new Vector3d(d, e, f)).normalize();
+    if(trinorm.dot(rayIn.direction) == 0) return false; //if plane is parallel to ray
 	//p + td = a + beta(b - a) + gamma(c - a), a, b, c vertices
     //use Cramer's rule
     Vector3d a = (new Vector3d(owner.getPosition(index.x)));
@@ -74,47 +74,57 @@ public class Triangle extends Surface {
     		(new Vector3d(rayIn.direction)),
     		(new Vector3d(a)).sub(rayIn.origin)
     };
-    double[] dets = new double[3];
-    for(int i = 0; i < 3; i++){
-    	Vector3d[] v = new Vector3d[3];
-    	for(int j = 0; j < v.length; j++){
-    		if(i == j) v[j] = vecs[4];
-    		else v[j] = vecs[j];
-    	}
-    	Matrix3d cramer = new Matrix3d(v[0], v[1], v[2]);
-    	dets[i] = cramer.determinant();
-    }
-    
-    if(dets[0] < 0 || dets[1] < 0 || 1 - (dets[0] + dets[1]) < 0){
-    	return false;
+    double[] dets = cramer(vecs);
+    if(1 - dets[0] - dets[1] < 0) return false;
+    for(double d : dets){
+    	if(d < 0) return false;
     }
     
     outRecord.t = dets[2];
     outRecord.surface = this;
-    outRecord.location.set(new Vector3d(rayIn.origin).add(new Vector3d(rayIn.direction).mul(outRecord.t)));
+    outRecord.location.set(new Vector3d(rayIn.direction).mul(outRecord.t)).add(rayIn.origin);
+    if(owner.hasNormals()){
+    	Vector3d normA = (owner.getNormal(index.x));
+    	Vector3d normB = owner.getNormal(index.y);
+    	Vector3d normC = owner.getNormal(index.z);
     
-    Vector3d normA = (owner.getNormal(index.x));
-    Vector3d normB = owner.getNormal(index.y);
-    Vector3d normC = owner.getNormal(index.z);
+    	Vector3d alpha = (new Vector3d(normA)).mul(1 - dets[0] - dets[1]);
+    	Vector3d beta = (new Vector3d(normB)).mul(dets[0]);
+    	Vector3d gamma = (new Vector3d(normC)).mul(dets[1]);
+    	outRecord.normal.set(new Vector3d(alpha)).add(beta).add(gamma).normalize();
+    } else{
+    	outRecord.normal.set(norm);
+    }
     
-    Vector3d alpha = (new Vector3d(normA)).mul(1 - dets[0] - dets[1]);
-    Vector3d beta = (new Vector3d(normB)).mul(dets[0]);
-    Vector3d gamma = (new Vector3d(normC)).mul(dets[1]);
-    outRecord.normal.set(new Vector3d(alpha)).add(beta).add(gamma).normalize();
-    
-    Vector2d textA = owner.getUV(index.x);
-    Vector2d textB = owner.getUV(index.y);
-    Vector2d textC = owner.getUV(index.z);
-    
-    Vector2d alphaUV = (new Vector2d(textA)).mul(1 - dets[0] - dets[1]);
-    Vector2d betaUV = (new Vector2d(textB)).mul(dets[0]);
-    Vector2d gammaUV = (new Vector2d(textC)).mul(dets[1]);
-    outRecord.texCoords.set(new Vector2d(alphaUV)).add(betaUV).add(gammaUV);
-    
+    if(owner.hasUVs()){
+    	Vector2d textA = owner.getUV(index.x);
+    	Vector2d textB = owner.getUV(index.y);
+    	Vector2d textC = owner.getUV(index.z);
+
+    	Vector2d alphaUV = (new Vector2d(textA)).mul(1 - dets[0] - dets[1]);
+    	Vector2d betaUV = (new Vector2d(textB)).mul(dets[0]);
+    	Vector2d gammaUV = (new Vector2d(textC)).mul(dets[1]);
+    	outRecord.texCoords.set(new Vector2d(alphaUV)).add(betaUV).add(gammaUV);
+    }
 	return true;
 	
 	//TODO#A2 remember that rays can have ending points!
 	//check if textures are available
+  }
+  
+  private double[] cramer(Vector3d[] vecs){
+	  double[] dets = new double[3];
+	  double denom = (new Matrix3d(vecs[0], vecs[1], vecs[2])).determinant();
+	  for(int i = 0; i < dets.length; i++){
+		  Vector3d[] v = new Vector3d[3];
+		  for(int j = 0; j < v.length; j++){
+			  if(i == j) v[j] = vecs[3];
+			  else v[j] = vecs[j];
+		  }
+		  Matrix3d cramer = new Matrix3d(v[0], v[1], v[2]);
+		  dets[i] = cramer.determinant() / denom;
+	  }
+	  return dets;
   }
 
   /**
