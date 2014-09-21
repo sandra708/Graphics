@@ -34,18 +34,18 @@ public class Sphere extends Surface {
    * @return true if the surface intersects the ray
    */
   public boolean intersect(IntersectionRecord outRecord, Ray rayIn) {
-    Vector3d hyp = center.clone().sub(rayIn.origin);
-    Vector3d adj = (new Vector3d(rayIn.direction)).normalize().mul(hyp.dot(rayIn.direction));
-    Vector3d opp = adj.clone().sub(hyp);
-    if(opp.len() > radius) return false;
-    double adjLen = Math.pow(radius, 2) - opp.lenSq();
-    Vector3d adjShort = adj.clone().normalize().mul(adj.len() - adjLen);
-    Vector3d intersect = rayIn.origin.clone().add(adjShort);
-    Vector3d norm = (new Vector3d(intersect)).sub(center).normalize();
-    norm.normalize();
+	Vector3d coeff = (new Vector3d(rayIn.origin)).sub(center);
+    double a = rayIn.direction.lenSq();
+    double b = 2 * rayIn.direction.dot(coeff);
+    double c = coeff.lenSq() - Math.pow(radius, 2);
     
-    double t = adjShort.len() / rayIn.direction.len();
-    if(t > rayIn.end || t < rayIn.start) return false;
+    double t = quad(a, b, c);
+    
+    if(t == Double.NEGATIVE_INFINITY) return false;
+    else if(t < rayIn.start || t > rayIn.end) return false;
+    
+    Vector3d intersect = (new Vector3d(rayIn.origin)).addMultiple(t, rayIn.direction);
+    Vector3d norm = (new Vector3d(intersect)).sub(center).normalize();
     
 	outRecord.location.set(intersect);
 	outRecord.normal.set(norm);
@@ -67,6 +67,26 @@ public class Sphere extends Surface {
     outRecord.texCoords.set(phi / Math.PI, theta / (Math.PI * 2));
     
     return true;
+  }
+  
+  //returns smaller positive t-value, if one exists, or
+  //negative-infinity if there is no solution
+  private double quad(double a, double b, double c){
+	  double det = Math.pow(b, 2) - 4 * a * c;
+	  if(det < 0) return Double.NEGATIVE_INFINITY;
+	  double t1 = ((-b) + Math.sqrt(det))/(2 * a);
+	  double t2 = ((-b) - Math.sqrt(det))/(2 * a);
+	  double t;
+	  if(t1 < 0){
+		  if(t2 < 0) return Double.NEGATIVE_INFINITY;
+		  return t2;
+	  }else{
+		  if(t2 < 0) return t1;
+		  else{
+			  if(t1 < t2) return t1;
+			  return t2;
+		  }
+	  }
   }
   
   /**
