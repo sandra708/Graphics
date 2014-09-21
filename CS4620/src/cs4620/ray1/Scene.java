@@ -88,13 +88,14 @@ public class Scene {
 	 * @return true if any intersection is found
 	 */
 	public boolean getAnyIntersection(Ray ray) {
-		return intersect(new IntersectionRecord(), ray, true);	
+		IntersectionRecord r = new IntersectionRecord();
+		boolean result = intersect(r, ray, true);
+		return result;
 	}
 	
 	private boolean intersect(IntersectionRecord outRecord, Ray rayIn, boolean anyIntersection) {
 		outRecord.set(new IntersectionRecord());
-		outRecord.t = Integer.MAX_VALUE;
-		rayIn.makeOffsetRay();
+		outRecord.t = Double.POSITIVE_INFINITY;
 		boolean anyIntersect = false;
 		for(Surface s : surfaces){
 			IntersectionRecord r = new IntersectionRecord();

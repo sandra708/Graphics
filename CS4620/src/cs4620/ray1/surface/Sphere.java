@@ -35,19 +35,22 @@ public class Sphere extends Surface {
    */
   public boolean intersect(IntersectionRecord outRecord, Ray rayIn) {
     Vector3d hyp = center.clone().sub(rayIn.origin);
-    Vector3d adj = rayIn.direction.clone().normalize().mul(hyp.dot(rayIn.direction));
+    Vector3d adj = (new Vector3d(rayIn.direction)).normalize().mul(hyp.dot(rayIn.direction));
     Vector3d opp = adj.clone().sub(hyp);
     if(opp.len() > radius) return false;
     double adjLen = Math.pow(radius, 2) - opp.lenSq();
     Vector3d adjShort = adj.clone().normalize().mul(adj.len() - adjLen);
     Vector3d intersect = rayIn.origin.clone().add(adjShort);
-    Vector3d norm = adj.clone().mul(-adjLen).add(opp);
+    Vector3d norm = (new Vector3d(intersect)).sub(center).normalize();
     norm.normalize();
+    
+    double t = adjShort.len() / rayIn.direction.len();
+    if(t > rayIn.end || t < rayIn.start) return false;
     
 	outRecord.location.set(intersect);
 	outRecord.normal.set(norm);
 	outRecord.surface = this;
-	outRecord.t = adjShort.len() / rayIn.direction.len();
+	outRecord.t = t;
 	
 	double phi = norm.angle(new Vector3d(0, 1, 0));
 	Vector3d normHoriz = (new Vector3d()).set(norm.x, 0, norm.z);

@@ -244,6 +244,8 @@ public class RayTracer {
 		if(intersect){
 			if(outRecord.surface == null){
 				scene.getFirstIntersection(outRecord, ray);
+			}else if(outRecord.surface.toString().contains("sphere")){
+				int x = 0;
 			}
 			Shader s = outRecord.surface.getShader();
 			s.shade(outColor, scene, ray, outRecord);

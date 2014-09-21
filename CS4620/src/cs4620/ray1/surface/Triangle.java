@@ -76,9 +76,8 @@ public class Triangle extends Surface {
     };
     double[] dets = cramer(vecs);
     if(1 - dets[0] - dets[1] < 0) return false;
-    for(double d : dets){
-    	if(d < 0) return false;
-    }
+    if(dets[0] < 0 || dets[1] < 0) return false;
+    if(dets[2] < rayIn.start) return false;
     
     outRecord.t = dets[2];
     outRecord.surface = this;

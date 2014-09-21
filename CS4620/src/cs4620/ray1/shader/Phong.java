@@ -56,6 +56,11 @@ public class Phong extends Shader {
 			double len = toLight.len();
 			Ray shadowRay = new Ray();
 			if(!isShadowed(scene, light, record, shadowRay)){
+				if(light == scene.getLights().get(0)) {
+					int x = 0;
+				}else if(light == scene.getLights().get(1)){
+					int y = 0;
+				}
 				Vector3d l = (new Vector3d(toLight)).normalize();
 				Vector3d n = (new Vector3d(record.normal)).normalize();
 				Vector3d v = (new Vector3d(ray.direction)).negate().normalize();
