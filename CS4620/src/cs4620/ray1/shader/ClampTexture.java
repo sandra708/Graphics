@@ -21,25 +21,28 @@ public class ClampTexture extends Texture {
 		}
 		
 		double x = texCoord.x;
-		if(x < 0){
-			x = 0;
-		} else if(x > 1){
-			x = 1;
-		}
 		double y = texCoord.y;
-		if(y < 0){
-			y = 0;
-		} else if(y > 1){
-			y = 1;
-		}
 		
 		Raster pixels = image.getRaster();
 		int width = pixels.getWidth();
 		int height = pixels.getHeight();
 		
 		int i = (int) (x * width + 0.5);
+		if(i < pixels.getMinX()) i = pixels.getMinX();
+		if(i >= pixels.getMinX() + pixels.getWidth()) i = pixels.getMinX() + pixels.getWidth() - 1;
+		
 		int j = (int) (height - y * height + 0.5);
-		int rgb = image.getRGB(i, j);
+		if(j < pixels.getMinY()) j = pixels.getMinY();
+		if(j >= pixels.getMinY() + pixels.getHeight()) j = pixels.getMinY() + pixels.getHeight() - 1;
+		
+		int rgb = 0;
+		try{
+			rgb = image.getRGB(i, j);
+		} catch(ArrayIndexOutOfBoundsException e){
+			System.out.println("Clamp " + i + ", " + j + " failed.");
+			e.printStackTrace();
+		}
+		
 		
 		Colord outColor = new Colord(Color.fromIntRGB(rgb));
 				

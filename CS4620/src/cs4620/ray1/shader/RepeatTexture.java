@@ -29,10 +29,28 @@ public class RepeatTexture extends Texture {
 		int width = pixels.getWidth();
 		int height = pixels.getHeight();
 		
-		int i = (int) ((x * width + 0.5) % width) + pixels.getMinX();
-		int j = (int) ((height - y * height + 0.5) % height) + pixels.getMinY();
-		int rgb = image.getRGB(i, j); //ArrayIndexOutOfBounds - teapot, 28%
-		
+		int i = (int) ((x * width + 0.5) % width);
+		if(i < 0) i += width;
+		i += pixels.getMinX();
+		int j = (int) ((height - y * height + 0.5) % height);
+		if(j < 0) j += height;
+		j += pixels.getMinY();
+		if(i < 0 || i < pixels.getMinX()){
+			i = pixels.getMinX();
+		} if (i > width + pixels.getMinX()){
+			i = width - 1;
+		} if (j < 0 || j < pixels.getMinY()){
+			j = pixels.getMinY();
+		} if(j > height + pixels.getMinY()){
+			j = height - 1;
+		}
+		int rgb = 0;
+		try{
+			rgb = image.getRGB(i, j); //ArrayIndexOutOfBounds - teapot, 28%
+		} catch(ArrayIndexOutOfBoundsException e){
+			System.out.println("Index " + i + ", " + j + " failed.");
+			e.printStackTrace();
+		}
 		Colord outColor = new Colord(Color.fromIntRGB(rgb));
 				
 		// TODO#A2: Fill in this function.
