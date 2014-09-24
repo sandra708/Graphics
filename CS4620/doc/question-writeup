@@ -1,0 +1,68 @@
+Alexandra Anderson
+aea84
+
+Q1.
+
+a)
+Center of image:
+Is on earth : true
+x : 0.6380793245935479
+y : 0.6417954054652171
+z : 0.42538621639567964
+
+b)
+lat : 39.92582901356466 degrees S.
+long : 56.30993247402138 degrees W.
+
+c)
+This point is shadowed by the moon : false
+
+Q2.
+
+a)
+The sun is 64.82707778849147 degrees below vertical
+
+b)
+The center pixel has the value 0.12760548776316333
+
+Q3. A copy of the file contained in solar_eclipse.xml
+
+<scene>
+	<exposure>3.3</exposure>
+	<camera type = "PerspectiveCamera">
+		<viewPoint>450 100.5 300</viewPoint>
+		<viewDir>-0.692 -0.1538 -0.4615</viewDir>
+		<viewUp>0 1 0</viewUp>
+		<projDistance>25</projDistance>
+		<viewWidth>5</viewWidth>
+		<viewHeight>5</viewHeight>
+	</camera>
+	<texture type = "RepeatTexture" name = "earthTex">
+		<image>../../textures/Earth.png</image>
+	</texture>
+	<shader name = "earth" type = "Phong">
+		<texture ref = "earthTex" />
+		<specularColor>0.9 0.7 0.3</specularColor>
+		<exponent>10</exponent>
+	</shader>
+	<shader name = "moon" type = "Phong">
+		<diffuseColor>0.4 0.4 0.4</diffuseColor>
+		<specularColor>1 1 1</specularColor>
+		<exponent>5</exponent>
+	</shader>
+	<image>2048 2048</image>
+	<surface type = "Sphere">
+		<shader ref = "earth" />
+		<center>0 0 0</center>
+		<radius>1</radius>
+	</surface>
+	<surface type = "Sphere">
+		<shader ref = "moon" />
+		<center>0 1 56.54</center>
+		<radius>0.27</radius>
+	</surface>
+	<light>
+		<position>0 0 23679</position>
+		<intensity>100000000 100000000 100000000</intensity>
+	</light>
+</scene>

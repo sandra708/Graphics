@@ -1,0 +1,39 @@
+<scene>
+	<exposure>3.3</exposure>
+	<camera type = "PerspectiveCamera">
+		<viewPoint>450 100.5 300</viewPoint>
+		<viewDir>-0.692 -0.1538 -0.4615</viewDir>
+		<viewUp>0 1 0</viewUp>
+		<projDistance>25</projDistance>
+		<viewWidth>5</viewWidth>
+		<viewHeight>5</viewHeight>
+	</camera>
+	<texture type = "RepeatTexture" name = "earthTex">
+		<image>../../textures/Earth.png</image>
+	</texture>
+	<shader name = "earth" type = "Phong">
+		<texture ref = "earthTex" />
+		<specularColor>0.9 0.7 0.3</specularColor>
+		<exponent>10</exponent>
+	</shader>
+	<shader name = "moon" type = "Phong">
+		<diffuseColor>0.4 0.4 0.4</diffuseColor>
+		<specularColor>1 1 1</specularColor>
+		<exponent>5</exponent>
+	</shader>
+	<image>2048 2048</image>
+	<surface type = "Sphere">
+		<shader ref = "earth" />
+		<center>0 0 0</center>
+		<radius>1</radius>
+	</surface>
+	<surface type = "Sphere">
+		<shader ref = "moon" />
+		<center>0 1 56.54</center>
+		<radius>0.27</radius>
+	</surface>
+	<light>
+		<position>0 0 23679</position>
+		<intensity>100000000 100000000 100000000</intensity>
+	</light>
+</scene>

@@ -1,0 +1,10 @@
+Warmup a2-Rays
+
+
+Ray (center of camera) = (450, 100.5, 300) + (-9/13, -2/13, -6/13)t
+Camera: width(5) height(5) projection(25)
+Earth = Center(0, 0, 0) Radius 1
+
+Sun = Position(23679/root(2), 0, 23679/root(2)), intensity(100,000,000) in each direction or is this a vector?
+
+Moon: center(0, 1, 56.54), radius(0.27)
