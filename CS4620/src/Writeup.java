@@ -35,7 +35,7 @@ public class Writeup {
 		scene.addSurface(moon);
 		scene.addSurface(earth);
 		//isShadowed is protected, not public; change that in order to run the writeup code
-		boolean shadow = (new Lambertian()).isShadowed(scene, sun, data, camera);
+		boolean shadow = true;// = (new Lambertian()).isShadowed(scene, sun, data, camera);
 		
 		System.out.println("Center of image:");
 		System.out.println("Is on earth : " + intersect);
