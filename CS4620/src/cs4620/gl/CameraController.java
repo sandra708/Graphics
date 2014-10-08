@@ -101,7 +101,7 @@ public class CameraController {
 		rot.mulBefore(rotY);
 		rot.mulBefore(rotZ);
 		if(orbitMode){
-			transformation.mulAfter(rot);
+			transformation.mulBefore(parentWorld).mulBefore(rot).mulBefore((new Matrix4(parentWorld)).invert());
 		} else{
 			transformation.mulBefore(rot); //around the camera's viewpoint
 		}

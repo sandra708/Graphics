@@ -29,8 +29,11 @@ import egl.BlendState;
 import egl.DepthState;
 import egl.IDisposable;
 import egl.RasterizerState;
+import egl.math.Matrix3;
 import egl.math.Matrix4;
 import egl.math.Vector2;
+import egl.math.Vector3;
+import egl.math.Vector4;
 import ext.csharp.ACEventFunc;
 
 public class ManipController implements IDisposable {
@@ -193,14 +196,53 @@ public class ManipController implements IDisposable {
 	 * @param curMousePos The point where the mouse is now, in normalized [-1,1] x [-1,1] coordinates.
 	 */
 	public void applyTransformation(Manipulator manip, RenderCamera camera, RenderObject object, Vector2 lastMousePos, Vector2 curMousePos) {
+		Matrix4 mCamToWorld = (new Matrix4(camera.mViewProjection)).invert();
+		//ray-identifiers in canonical space
+		Vector3 last1 = new Vector3(lastMousePos.x, lastMousePos.y, 0);
+		Vector3 last2 = new Vector3(lastMousePos.x, lastMousePos.y, 1);
+		Vector3 cur1 = new Vector3(curMousePos.x, curMousePos.y, 0);
+		Vector3 cur2 = new Vector3(curMousePos.x, curMousePos.y, 1);
+		//conversion to world space
+		mCamToWorld.mulPos(last1);
+		mCamToWorld.mulPos(last2);
+		mCamToWorld.mulPos(cur1);
+		mCamToWorld.mulPos(cur2);
+		//conversion of manipulator axis to world space
+		Matrix4 mManipToWorld;
+		if(parentSpace){
+			mManipToWorld = object.mWorldTransform;
+		}else{
+			mManipToWorld = object.parent.mWorldTransform;
+		}
+		Vector3 axisPos = mManipToWorld.mulPos(new Vector3(0));
+		Vector3 axisDir;
+		switch(manip.axis){
+		case 0: axisDir = new Vector3(1, 0, 0); break;
+		case 1: axisDir = new Vector3(0, 1, 0); break;
+		case 2: 
+		default: axisDir = new Vector3(0, 0, 0); break;
+		}
+		axisDir = object.mWorldTransform.mulDir(axisDir);
 		
-		Ray lastPos = new Ray();
-		Ray curPos = new Ray();
+		Matrix4 info1 = new Matrix4(last1, last2.sub(last1), axisPos, axisDir);
+		Matrix4 info2 = new Matrix4(cur2, cur2.sub(cur1), axisPos, axisDir);
 		
+		float lastIntersection = findIntersection(info1);
+		float curIntersection = findIntersection(info2);
+		
+		Matrix4 mManip;
 		switch(manip.type){
-		case 0: applyScale(manip.axis, camera, object, lastMousePos, curMousePos); break;
-		case 1: applyRotation(manip.axis, camera, object, lastMousePos, curMousePos); break;
-		case 2: applyTranslation(manip.axis, camera, object, lastMousePos, curMousePos); break;
+		case 0: 
+			mManip = getScale(manip.axis, curIntersection / lastIntersection); break;
+		case 1: 
+			mManip = getRotation(manip.axis, lastMousePos, curMousePos); break;
+		default: 
+			mManip = getTranslation(manip.axis, curIntersection - lastIntersection); break;
+		}
+		if(parentSpace){
+			object.mWorldTransform.mulAfter(mManip);
+		} else{
+			object.mWorldTransform.mulBefore(mManip);
 		}
 		
 		// There are three kinds of manipulators; you can tell which kind you are dealing with by looking at manip.type.
@@ -222,7 +264,7 @@ public class ManipController implements IDisposable {
 		// TODO#A3
 	}
 	
-	private void applyRotation(int axis, RenderCamera camera, RenderObject obj, Vector2 lastMousePos, Vector2 curMousePos){
+	private Matrix4 getRotation(int axis, Vector2 lastMousePos, Vector2 curMousePos){
 		Matrix4 rot = new Matrix4();
 		float delta = curMousePos.y - lastMousePos.y;
 		
@@ -237,20 +279,50 @@ public class ManipController implements IDisposable {
 			Matrix4.createRotationZ(delta, rot);
 		default:
 		}
-		
-		if(parentSpace){
-			obj.sceneObject.transformation.mulAfter(rot);
-		} else{
-			obj.sceneObject.transformation.mulBefore(rot);
+		return rot;
+	}
+	
+	private Matrix4 getTranslation(int axis, float factor){
+		Matrix4 trans;
+		switch(axis){
+		case 0: trans = Matrix4.createTranslation(new Vector3(factor, 0, 0)); break;
+		case 1: trans = Matrix4.createTranslation(new Vector3(0, factor, 0)); break;
+		default: trans = Matrix4.createTranslation(new Vector3(0, 0, factor)); break;
 		}
+		return trans;
 	}
 	
-	private void applyTranslation(int axis, RenderCamera camera, RenderObject obj, Vector2 lastMousePos, Vector2 curMousePos){
-		
+	private Matrix4 getScale(int axis, float factor){
+		Matrix4 scale;
+		switch(axis){
+		case 0: scale = Matrix4.createScale(new Vector3(factor, 1, 1));
+		case 1: scale = Matrix4.createScale(new Vector3(1, factor, 1));
+		default: scale = Matrix4.createScale(new Vector3(1, 1, factor));
+		}
+		return scale;
 	}
 	
-	private void applyScale(int axis, RenderCamera camera, RenderObject obj, Vector2 lastMousePos, Vector2 curMousePos){
+	/**
+	 * 
+	 * @param storage: position and direction of both the mouse-click ray and the axis
+	 * @return t-value along axis to identify closest ray approach
+	 */
+	private float findIntersection(Matrix4 storage){
+		Vector3 rayPos = storage.getX();
+		Vector3 rayDir = storage.getY();
+		Vector3 axisPos = storage.getZ();
+		Vector3 axisDir = storage.getTrans();
 		
+		Vector3 perpDir = (new Vector3 (rayDir)).cross(axisDir);
+		perpDir.normalize();
+		Vector3 coeff = (new Vector3(rayPos)).sub(axisPos);
+		rayDir.negate();
+		
+		//Ray(t) - Axis(s) -> set to direction of perpDir
+		//(-rayDir*s + axisDir*t - perpDir*r = axisPos - rayPos
+		Matrix3 cramerNum = new Matrix3(rayDir, axisDir, perpDir);
+		Matrix3 cramerDenom = new Matrix3(rayDir, coeff, perpDir);
+		return cramerNum.determinant() / cramerDenom.determinant();
 	}
 	
 	public void checkMouse(int mx, int my, RenderCamera camera) {

@@ -4,6 +4,7 @@ import cs4620.common.SceneCamera;
 import cs4620.common.SceneObject;
 import egl.math.Matrix4;
 import egl.math.Vector2;
+import egl.math.Vector3;
 
 public class RenderCamera extends RenderObject {
 	/**
@@ -43,7 +44,17 @@ public class RenderCamera extends RenderObject {
 		this.viewportSize.set(viewportSize);
 		
 		Matrix4 cam = (new Matrix4(mWorldTransform)).invert();
-		Matrix4 scale = new Matrix4(); //this should scale (proj) so iS.x/iS.y = vS.x / vS.y
+		Matrix4 scale = new Matrix4(); 
+		float vpRatio = viewportSize.x / viewportSize.y;
+		double iRatio = (sceneCamera.imageSize.x / sceneCamera.imageSize.y);
+		Vector3 scaleFactor;
+		if(vpRatio > iRatio){
+			scaleFactor = new Vector3((float) (vpRatio * sceneCamera.imageSize.y), 1, 1);
+		} else{
+			scaleFactor = new Vector3(1, (float) (sceneCamera.imageSize.x / vpRatio), 1);
+		}
+		scale = Matrix4.createScale(scaleFactor);
+		
 		Matrix4 proj = new Matrix4();
 		if(sceneCamera.isPerspective){
 			Matrix4.createPerspective((float) sceneCamera.imageSize.x, (float) sceneCamera.imageSize.y, 
@@ -52,7 +63,7 @@ public class RenderCamera extends RenderObject {
 			Matrix4.createOrthographic((float) sceneCamera.imageSize.x, (float) sceneCamera.imageSize.y, 
 					(float) sceneCamera.zPlanes.x, (float) sceneCamera.zPlanes.y, proj);
 		}
-		
+		proj.mulAfter(scale);
 		cam.mulBefore(proj, mViewProjection);
 		// The camera's transformation matrix is found in this.mWorldTransform (inherited from RenderObject).
 		// The other camera parameters are found in the scene camera (this.sceneCamera).
