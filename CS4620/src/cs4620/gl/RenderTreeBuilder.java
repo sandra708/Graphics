@@ -1,5 +1,6 @@
 package cs4620.gl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import cs4620.common.Material;
@@ -9,6 +10,8 @@ import cs4620.common.SceneCamera;
 import cs4620.common.SceneLight;
 import cs4620.common.SceneObject;
 import cs4620.common.Texture;
+import egl.math.Matrix3;
+import egl.math.Matrix4;
 import egl.math.Vector2;
 
 /**
@@ -118,7 +121,23 @@ public class RenderTreeBuilder {
 	 * @param env  The environment containing the hierarchy to be processed.
 	 */
 	public static void rippleTransformations(RenderEnvironment env) {
-		// TODO#A3
+		//TODO#A3
+		rippleTree(env.root, new Matrix4(), new Matrix3());
+		for(RenderCamera c : env.cameras){
+			c.updateCameraMatrix(c.viewportSize);
+		}
+	}
+	
+	private static void rippleTree(RenderObject root, Matrix4 transform, Matrix3 transformIT){
+		Matrix4 local = new Matrix4(root.sceneObject.transformation);
+		Matrix3 localIT = local.getAxes();
+		local.mulBefore(transform);
+		localIT.mulBefore(transformIT); 
+		root.mWorldTransform.set(local);
+		root.mWorldTransformIT.set(localIT);
+		for(RenderObject child : root.children){
+			rippleTree(child, local, localIT);
+		}
 	}
 	
 	/**

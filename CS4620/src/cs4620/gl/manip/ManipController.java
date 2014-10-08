@@ -22,6 +22,7 @@ import cs4620.gl.RenderCamera;
 import cs4620.gl.RenderEnvironment;
 import cs4620.gl.RenderObject;
 import cs4620.gl.Renderer;
+import cs4620.ray1.Ray;
 import cs4620.scene.form.ControlWindow;
 import cs4620.scene.form.ScenePanel;
 import egl.BlendState;
@@ -192,7 +193,16 @@ public class ManipController implements IDisposable {
 	 * @param curMousePos The point where the mouse is now, in normalized [-1,1] x [-1,1] coordinates.
 	 */
 	public void applyTransformation(Manipulator manip, RenderCamera camera, RenderObject object, Vector2 lastMousePos, Vector2 curMousePos) {
-
+		
+		Ray lastPos = new Ray();
+		Ray curPos = new Ray();
+		
+		switch(manip.type){
+		case 0: applyScale(manip.axis, camera, object, lastMousePos, curMousePos); break;
+		case 1: applyRotation(manip.axis, camera, object, lastMousePos, curMousePos); break;
+		case 2: applyTranslation(manip.axis, camera, object, lastMousePos, curMousePos); break;
+		}
+		
 		// There are three kinds of manipulators; you can tell which kind you are dealing with by looking at manip.type.
 		// Each type has three different axes; you can tell which you are dealing with by looking at manip.axis.
 
@@ -210,6 +220,37 @@ public class ManipController implements IDisposable {
 		// You may find it helpful to structure your code into a few helper functions; ours is about 150 lines.
 		
 		// TODO#A3
+	}
+	
+	private void applyRotation(int axis, RenderCamera camera, RenderObject obj, Vector2 lastMousePos, Vector2 curMousePos){
+		Matrix4 rot = new Matrix4();
+		float delta = curMousePos.y - lastMousePos.y;
+		
+		switch(axis){
+		case 0: 
+			Matrix4.createRotationX(delta, rot);
+			break;
+		case 1:
+			Matrix4.createRotationY(delta, rot);
+			break;
+		case 2:
+			Matrix4.createRotationZ(delta, rot);
+		default:
+		}
+		
+		if(parentSpace){
+			obj.sceneObject.transformation.mulAfter(rot);
+		} else{
+			obj.sceneObject.transformation.mulBefore(rot);
+		}
+	}
+	
+	private void applyTranslation(int axis, RenderCamera camera, RenderObject obj, Vector2 lastMousePos, Vector2 curMousePos){
+		
+	}
+	
+	private void applyScale(int axis, RenderCamera camera, RenderObject obj, Vector2 lastMousePos, Vector2 curMousePos){
+		
 	}
 	
 	public void checkMouse(int mx, int my, RenderCamera camera) {

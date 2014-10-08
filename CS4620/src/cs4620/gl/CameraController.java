@@ -93,7 +93,18 @@ public class CameraController {
 	 * @param rotation  The rotation in degrees, as Euler angles (rotation angles about x, y, z axes)
 	 */
 	private void rotate(Matrix4 parentWorld, Matrix4 transformation, Vector3 rotation) {
-		// TODO#A3
+		//TODO#A3
+		Matrix4 rotX = Matrix4.createRotationX(rotation.x);
+		Matrix4 rotY = Matrix4.createRotationY(rotation.y);
+		Matrix4 rotZ = Matrix4.createRotationZ(rotation.z);
+		Matrix4 rot = new Matrix4(rotX);
+		rot.mulBefore(rotY);
+		rot.mulBefore(rotZ);
+		if(orbitMode){
+			transformation.mulAfter(rot);
+		} else{
+			transformation.mulBefore(rot); //around the camera's viewpoint
+		}
 	}
 	
 	/**
@@ -105,6 +116,7 @@ public class CameraController {
 	 * @param motion  The translation in camera-space units
 	 */
 	private void translate(Matrix4 parentWorld, Matrix4 transformation, Vector3 motion) {
-		// TODO#A3
+		Matrix4 trans = Matrix4.createTranslation(motion);
+		transformation.mulAfter(trans);
 	}
 }
