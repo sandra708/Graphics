@@ -267,7 +267,7 @@ public class ManipController implements IDisposable {
 		} else{
 			z = (float) cam.sceneCamera.zPlanes.y;
 		}
-		return /*cam.mWorldTransform.mulPos*/(camToWorld.mulPos(new Vector3(x, y, z)));
+		return (camToWorld.mulPos(new Vector3(x, y, z)));
 	}
 	
 	private Matrix4 getRotation(int axis, Vector2 lastMousePos, Vector2 curMousePos){
@@ -290,7 +290,7 @@ public class ManipController implements IDisposable {
 	
 	private Matrix4 getTranslation(int axis, RenderCamera camera, Matrix4 manipToWorld, Vector2 lastMousePos, Vector2 curMousePos){
 		float t1 = getT(axis, camera, manipToWorld, lastMousePos);
-		float t2 = getT(axis, camera, manipToWorld, lastMousePos);
+		float t2 = getT(axis, camera, manipToWorld, curMousePos);
 		float factor = t2 - t1;
 		Matrix4 trans;
 		switch(axis){
@@ -339,36 +339,6 @@ public class ManipController implements IDisposable {
 		coeffs.invert();
 		Vector3 result = coeffs.mul(new Vector3(affine));
 		return result.x;
-	}
-	
-	/**
-	 * 
-	 * @param storage: position and direction of both the mouse-click ray and the axis
-	 * @return t-value along axis to identify closest ray approach
-	 */
-	private float findIntersection(Matrix4 storage){ //error here! (do written q's now
-		Vector3 rayPos = storage.getX();
-		Vector3 rayDir = storage.getY();
-		Vector3 axisPos = storage.getZ();
-		Vector3 axisDir = storage.getTrans();
-		
-		//(-rayDir*s + axisDir*t - perpDir*r = axisPos - rayPos
-		Vector3 perpDir = (new Vector3 (rayDir)).cross(axisDir);
-		perpDir.normalize();
-		Vector3 c = (new Vector3(rayPos)).sub(axisPos);
-		rayDir.negate().normalize();
-		
-		Matrix3 affine = (new Matrix3(rayDir, axisDir, perpDir)).transpose();
-		Matrix3 inverse = (new Matrix3(affine)).invert();
-		inverse.mul(c);
-		return c.y;
-		//Ray(t) - Axis(s) -> set to direction of perpDir
-		//(-rayDir*s + axisDir*t - perpDir*r = axisPos - rayPos
-//		Matrix3 cramerNum = new Matrix3(rayDir, axisDir, perpDir);
-//		Matrix3 cramerDenom = new Matrix3(rayDir, c, perpDir);
-//		float numDet = cramerNum.determinant();
-//		float denomDet = cramerDenom.determinant();
-//		return cramerNum.determinant() / cramerDenom.determinant();
 	}
 	
 	public void checkMouse(int mx, int my, RenderCamera camera) {
