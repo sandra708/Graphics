@@ -1,0 +1,152 @@
+\documentclass{letter}
+
+\usepackage{amsmath}
+
+\begin{document}
+
+Alexandra Anderson (aea84)
+\\CS 4620: A3 Scene
+\\Readme and Written Response
+
+1) 
+
+a) A is a matrix to rotate 30 degrees counter-clockwise, B translates two over and three up, and C scales non uniformly, y times 5 and x remains the same. 
+
+b)
+By ABC: 
+\\({0.23205078, 3.598076})
+\\({-2.267949, 7.928203})
+\\({1.0980761, 4.098076})
+\\({-1.4019239, 8.428204})
+
+By CBA: 
+\\({2.232051, 32.99038})
+\\({-0.2679491, 54.641018})
+\\({3.098076, 35.49038})
+\\({0.5980761, 57.141018})
+
+c) Because matrix multiplication is not commutative. Specifically, CBA scales after the translation, so the translated numbers scale as well.
+
+2) 
+
+a) Camera space is where the entire geometry is expressed relative to the camera's frame, so that the camera is located at the origin and oriented relative to the axes.
+
+$$M_{cam} = $$
+
+b) The perspective transformation merely changes distant geometry so that it is smaller than close-up geometry. It sends the viewing frustum, which is a cone with top and bottom cut off, into the canonical orthographic view volume, which is a cube. 
+
+c) The canonical viewing volume contains all of the geometry which will be visible in the picture. It is the cube directly in front of the plane onto which it projects, orthographically. 
+
+3)
+Givens:
+\\The camera is at the origin pointing in the negative z direction, the y-axis is up (as per usual)
+\\The image plane is a square in the z=-3 plane with side length 5 centered at (0,0,-3).
+\\The translation manipulator's origin is located at (1,1,-6)
+\\The translation manipulator is pointing in the direction of (-1,-1,-1) EDIT: though you should normalize this vector such that your 
+final parameter values match ours
+\\The translation manipulator corresponds to the object's object-space x-axis.
+\\The user has clicked on world-space coordinates c1 = (1.5,1,-3) and c2 = (-.5,0,-3) [note that these are on the image plane]
+
+a) The equations of the two rays are : $(0, 0, 0) + s*(1.5, 1, -3)$  and $(0, 0, 0) + t * (-.5, 0, -3) $.
+
+b) To find our second planar vector, $w= (axis \times  iNorm)$ is a unique direction which is parallel to the image plane. Then our plane is defined by $p = q * (w) + r * axis + o$, where o is the origin of the manipulator. In our example, axis = (-1, -1, -1), normalized to $(\frac{-1}{\sqrt{3}}, \frac{-1}{\sqrt{3}}, \frac{-1}{\sqrt{3}}), iNorm = (0, 0, 1), w = (\frac{-1}{\sqrt{3}}, \frac{1}{\sqrt{3}}, 0), o = (1, 1, -6)$. 
+
+Then the intersections mean solving the equation: Ray(q) = axis * s + w * t + o, a system of three equations in three variables. For the first ray: 
+
+$$
+\begin{pmatrix}
+\frac{-1}{\sqrt{3}} & \frac{-1}{\sqrt{3}} & -1.5 \\
+\frac{-1}{\sqrt{3}} & \frac{1}{\sqrt{3}} & -1 \\
+\frac{-1}{\sqrt{3}} & 0 & 3
+\end{pmatrix}
+\begin{pmatrix}
+s \\
+t \\
+q \\
+\end{pmatrix}
+=
+\begin{pmatrix}
+-1 \\
+-1 \\
+6 \\
+\end{pmatrix}
+$$
+
+We solve by multiplying by the inverse, and conclude that 
+
+$$
+\begin{pmatrix}
+s \\
+t \\
+q\\
+\end{pmatrix}
+=
+\begin{pmatrix}
+0.7205124 \\ -1.0115383 \\ 2.0230765
+\end{pmatrix}
+$$
+
+Where, to recall, (s, t) are the coordinates along the plane (axis, w) and q is the parameter along the (non-normalized) viewing ray. 
+
+Then we solve for a point ({1.1680238, 1.1920929E-7, -6.415988}) that is the world-coordinates intersection. It has manipulator-plane parameters (0.7205124, -1.0115383). 
+
+We employ a similar method to solve the second ray, showing less work. The matrix equation is:
+
+$$
+\begin{pmatrix}
+\frac{-1}{\sqrt{3}} & \frac{-1}{\sqrt{3}} & 0.5 \\
+\frac{-1}{\sqrt{3}} & \frac{1}{\sqrt{3}} & 0 \\
+\frac{-1}{\sqrt{3}} & 0 & 3
+\end{pmatrix}
+\begin{pmatrix}
+s \\
+t \\
+q \\
+\end{pmatrix}
+=
+\begin{pmatrix}
+-1 \\
+-1 \\
+6 \\
+\end{pmatrix}
+$$
+
+and we conclude with 
+
+$$
+\begin{pmatrix}
+s \\
+t \\
+q\\
+\end{pmatrix}
+=
+\begin{pmatrix}
+0.79860103 \\ -0.9334498 \\ 1.8668997
+\end{pmatrix}
+$$
+
+Giving us world coordinates of: ({1.077855, 0.0, -6.4610724}). 
+
+So we have two intersection points in world-space: ({1.1680238, 1.1920929E-7, -6.415988}) and ({1.077855, 0.0, -6.4610724}). To find the t-values of the points projected to the axis, we swap back to planar coordinates, where we have (0.7205124, -1.0115383) and (0.79860103, -0.9334498).
+
+Then we lift the axis-coordinates, so t1 = 0.7205124 and t2 = 0.79860103. 
+
+Then we have a translation matrix, given in manipulator space. 
+
+$$
+\begin{pmatrix}
+1 & 0 & 0 & t2 - t1 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 1
+\end{pmatrix}
+= 
+\begin{pmatrix}
+1 & 0 & 0 & 0.07808864 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 1
+\end{pmatrix}
+$$
+
+\end{document}

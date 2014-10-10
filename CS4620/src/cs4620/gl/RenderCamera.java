@@ -45,14 +45,16 @@ public class RenderCamera extends RenderObject {
 		
 		Matrix4 cam = (new Matrix4(mWorldTransform)).invert();
 		Matrix4 scale = new Matrix4(); 
-		float vpRatio = viewportSize.x / viewportSize.y;
-		double iRatio = (sceneCamera.imageSize.x / sceneCamera.imageSize.y);
-		Vector3 scaleFactor;
-		if(vpRatio > iRatio){
-			scaleFactor = new Vector3((float) (vpRatio * sceneCamera.imageSize.y), 1, 1);
-		} else{
-			scaleFactor = new Vector3(1, (float) (sceneCamera.imageSize.x / vpRatio), 1);
+		float vpRatio = viewportSize.x / viewportSize.y ;
+		float iRatio =  (float) (sceneCamera.imageSize.x /  sceneCamera.imageSize.y);
+		float xScale = 1;
+		float yScale = 1;
+		if(vpRatio < iRatio){
+			yScale = vpRatio / iRatio;
+		}else{
+			xScale = (iRatio / vpRatio);
 		}
+		Vector3 scaleFactor = new Vector3(xScale, yScale, 1);
 		scale = Matrix4.createScale(scaleFactor);
 		
 		Matrix4 proj = new Matrix4();
@@ -64,7 +66,7 @@ public class RenderCamera extends RenderObject {
 					(float) sceneCamera.zPlanes.x, (float) sceneCamera.zPlanes.y, proj);
 		}
 		proj.mulAfter(scale);
-		cam.mulBefore(proj, mViewProjection);
+		cam.mulAfter(proj, mViewProjection);
 		// The camera's transformation matrix is found in this.mWorldTransform (inherited from RenderObject).
 		// The other camera parameters are found in the scene camera (this.sceneCamera).
 		// Look through the methods in Matrix4 before you type in any matrices from the book or the OpenGL specification.

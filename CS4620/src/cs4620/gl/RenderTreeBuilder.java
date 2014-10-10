@@ -1,6 +1,5 @@
 package cs4620.gl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import cs4620.common.Material;
@@ -130,10 +129,12 @@ public class RenderTreeBuilder {
 	
 	private static void rippleTree(RenderObject root, Matrix4 transform, Matrix3 transformIT){
 		Matrix4 local = new Matrix4(root.sceneObject.transformation);
-		Matrix3 localIT = local.getAxes();
-		local.mulBefore(transform);
-		localIT.mulBefore(transformIT); 
+		local.mulAfter(transform); 
 		root.mWorldTransform.set(local);
+		Matrix4 IT = new Matrix4(local);
+		IT.invert().transpose();
+		Matrix3 localIT = IT.getAxes();
+		localIT.mulAfter(transformIT);
 		root.mWorldTransformIT.set(localIT);
 		for(RenderObject child : root.children){
 			rippleTree(child, local, localIT);

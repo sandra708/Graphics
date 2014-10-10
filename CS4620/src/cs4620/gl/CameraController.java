@@ -93,18 +93,28 @@ public class CameraController {
 	 * @param rotation  The rotation in degrees, as Euler angles (rotation angles about x, y, z axes)
 	 */
 	private void rotate(Matrix4 parentWorld, Matrix4 transformation, Vector3 rotation) {
-		//TODO#A3
-		Matrix4 rotX = Matrix4.createRotationX(rotation.x);
-		Matrix4 rotY = Matrix4.createRotationY(rotation.y);
-		Matrix4 rotZ = Matrix4.createRotationZ(rotation.z);
-		Matrix4 rot = new Matrix4(rotX);
-		rot.mulBefore(rotY);
-		rot.mulBefore(rotZ);
-		if(orbitMode){
-			transformation.mulBefore(parentWorld).mulBefore(rot).mulBefore((new Matrix4(parentWorld)).invert());
-		} else{
-			transformation.mulBefore(rot); //around the camera's viewpoint
+		rotation.mul((float) Math.PI / 180);
+		Matrix4[] rots = {
+				Matrix4.createRotationX(rotation.z),
+				Matrix4.createRotationY(rotation.y),
+				Matrix4.createRotationZ(rotation.x),
+		};
+		for(int i = 0; i < 3; i++){
+			Matrix4 rot = rots[i];
+			if(orbitMode){
+				Matrix4 mWT = new Matrix4(parentWorld);
+				mWT.mulBefore(transformation);
+				Vector3 e = mWT.getTrans();
+				mWT.getAxes().invert().mul(e);
+				Matrix4 trans = Matrix4.createTranslation(e);
+				rot.mulBefore(trans);
+				rot.mulAfter(trans.invert());
+				transformation.mulBefore(rot);
+			} else{
+				transformation.mulBefore(rot); //around the camera's viewpoint
+			}
 		}
+		camera.updateCameraMatrix(camera.viewportSize);
 	}
 	
 	/**
