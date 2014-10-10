@@ -31,11 +31,26 @@ c) Because matrix multiplication is not commutative. Specifically, CBA scales af
 
 a) Camera space is where the entire geometry is expressed relative to the camera's frame, so that the camera is located at the origin and oriented relative to the axes.
 
-$$M_{cam} = $$
+We are given $e = (1, 1, 0), g = (0, -1, 1), up = (1, 1, 0)$. So we say that z = normalize(-g), then $z = (0, \frac{1}{\sqrt{2}}, \frac{-1}{\sqrt{2}})$. Now we set x = normalize(${up} \times z$), so $x = (\frac{-1}{\sqrt{3}}, \frac{1}{\sqrt{3}}, \frac{1}{\sqrt{3}})$. Then we build $y = z \times x$, so $y = (\frac{2}{\sqrt{6}}, \frac{1}{\sqrt{6}}, \frac{1}{\sqrt{6}})$. 
 
-b) The perspective transformation merely changes distant geometry so that it is smaller than close-up geometry. It sends the viewing frustum, which is a cone with top and bottom cut off, into the canonical orthographic view volume, which is a cube. 
+$$M_{cam} = 
+\begin{pmatrix}
+\frac{-1}{\sqrt{3}} & \frac{1}{\sqrt{3}} & \frac{1}{\sqrt{3}} & 0 \\[0.5em]
+\frac{2}{\sqrt{6}} & \frac{1}{\sqrt{6}} & \frac{1}{\sqrt{6}} & \frac{3}{\sqrt{6}} \\[0.5em]
+0 &  \frac{1}{\sqrt{2}} & \frac{-1}{\sqrt{2}} & \frac{1}{\sqrt{2} } \\[0.5em]
+0 & 0 & 0 & 1
+\end{pmatrix}
+$$
 
-c) The canonical viewing volume contains all of the geometry which will be visible in the picture. It is the cube directly in front of the plane onto which it projects, orthographically. 
+In world space $p = (5, -20, 15)$. We multiply by $M_{cam}$ and homogenize, so that $p_{cam} = (\frac{-10}{\sqrt{3}}, \frac{8}{\sqrt{6}}, \frac{-34}{\sqrt{6}}) = (-5.7735023, 0.8164964, -25.455845)$. 
+
+b) The perspective transformation merely changes distant geometry so that it is smaller than close-up geometry. It sends the viewing frustum, which is a rectangular pyramid with the top cut off, into the canonical orthographic view volume, which is a cube. This collapses distant geometry, which used to be a wider view the more distant one was, into a constant-size square, so that the more distant the geometry was, the smaller it now is. 
+
+$p_{canon} = M_{prom}(p_{cam} = ({0.22680458, -0.032075007, 1.4357022})$, which is in the orthographic viewing cube. 
+
+c) The canonical viewing volume contains all of the geometry which will be visible in the picture. It is the cube directly in front of the plane onto which it projects, orthographically. One merely converts [-1, 1] into pixel coordinates and drops the z coordinate, and then displays the pixel on the screen. 
+
+$p = (0.22680458, -0.032075007)$ as pixel coordinates that run [-1, 1], and the canonical z-coordinate is 1.4357022.
 
 3)
 Givens:

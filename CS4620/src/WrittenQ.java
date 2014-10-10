@@ -63,6 +63,21 @@ public class WrittenQ {
 		System.out.println("World intersection 1: " + point2);
 		
 		System.out.println("Translation:" + -(coeff.x - result.x));
+		
+		Vector3 x = new Vector3(1, 1, 0).cross(new Vector3(0, 1, -1));
+		System.out.println("2: x = " + x);
+		Vector3 y = new Vector3(0, 1, -1).cross(x);
+		System.out.println("y = " + y +  y.lenSq());
+		
+		Matrix4 cam = Matrix4.createView(new Vector3(1, 1, 0), new Vector3(0, -1, 1), new Vector3(1, 1, 0));
+		Vector3 p = new Vector3(5, -20, 15);
+		cam.mulPos(p);
+		System.out.println(p);
+		Matrix4 proj = Matrix4.createPerspective(10, 10, -5, -30);
+		proj.mulPos(p);
+		System.out.println(p);
 	}
+	
+	
 
 }
