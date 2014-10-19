@@ -30,6 +30,7 @@ public class TexGenSphereNormalMap extends ACTextureGenerator {
 	
 	@Override
 	public void getColor(float u, float v, Color outColor) {
+		//testing
 		// TODO A4: Implement the sphere-disk normal map generation
 	}
 }
