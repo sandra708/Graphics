@@ -2,8 +2,9 @@ package cs4620.common.texture;
 
 import egl.math.Color;
 import egl.math.Colord;
+import egl.math.Vector2;
 import egl.math.Vector2i;
-import egl.math.Vector3d;
+
 
 public class TexGenSphereNormalMap extends ACTextureGenerator {
 	// 0.5f means that the discs are tangent to each other
@@ -28,9 +29,49 @@ public class TexGenSphereNormalMap extends ACTextureGenerator {
 		this.resolution = resolution;
 	}
 	
+	//not debugged!
 	@Override
 	public void getColor(float u, float v, Color outColor) {
-		//testing
 		// TODO A4: Implement the sphere-disk normal map generation
+		float[] uv = new float[] {u, v};
+		setDiskCoord(uv);
+		
+		double phi = uv[1] * Math.PI;
+		double y = Math.cos(phi);
+		double theta = uv[0] * 2 * Math.PI;
+		double x = Math.cos(theta) * Math.sin(phi);
+		double z = Math.sin(theta) * Math.sin(phi);
+		
+		Colord color = new Colord(x, y, z);
+		color.normalize();
+		color.mul(0.5);
+		color.add(0.5);
+		
+		outColor.set(color);
+	}
+	
+	//if u,v is on a disk, resets values to the center of the disk
+	private void setDiskCoord(float[] uv){
+		//convert to [0,res] x [0,res]
+		float uN = uv[0] * resolution;
+		float vN = uv[1] * resolution;
+		
+		//the nearest disc-center in [0,res] x [0,res] (epsilon for rounding-error)
+		float uR = Math.round(uN + 0.5 - 1e6) - 0.5f;
+		float vR = Math.round(vN + 0.5 - 1e6) - 0.5f;
+		
+		//if out-of-bounds there isn't an actual disc there (shouldn't ever happen)
+		if(uR < 0 || uR > resolution) return;
+		if(vR < 0 || vR > resolution) return;
+		
+		Vector2 n = new Vector2(uN, vN);
+		Vector2 r = new Vector2(uR, vR);
+		
+		//if point within disc, substitute disc-center for normaling purposes
+		float dist = n.sub(r).len();
+		if(dist <= bumpRadius * resolution){
+			uv[0] = uR / resolution;
+			uv[1] = vR / resolution;
+		}
 	}
 }
