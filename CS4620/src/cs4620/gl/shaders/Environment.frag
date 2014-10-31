@@ -16,6 +16,10 @@ uniform vec3 lightPosition[MAX_LIGHTS];
 uniform vec3 worldCam;
 uniform float exposure;
 
+varying vec4 worldPos;
+
 void main() {
+	vec3 dir = normalize(worldPos.xyz - worldCam);
+	gl_FragColor = getEnvironmentColor(dir) * exposure;
 	// TODO A4: Implement environment mapping fragment shader
 }

@@ -15,6 +15,18 @@ attribute vec4 vPosition; // Sem (POSITION 0)
 attribute vec3 vNormal; // Sem (NORMAL 0)
 attribute vec2 vUV; // Sem (TEXCOORD 0)
 
+varying vec4 worldPos;
+varying vec3 fNormal;
+varying vec2 fUV;
+
 void main() {
 	// TODO A4: Implement normal mapping vertex shader
+	// Calculate Point In World Space
+	worldPos = mWorld * vPosition;
+	// Calculate Projected Point
+	gl_Position = mViewProjection * worldPos;
+
+	// We have to use the inverse transpose of the world transformation matrix for the normal
+	fN = normalize((mWorldIT * vNormal).xyz);
+	fUV = vUV;
 }
