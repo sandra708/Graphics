@@ -15,7 +15,7 @@ public class ToleranceSliderPanel extends JPanel implements ChangeListener
 	private static final long serialVersionUID = 3977294404597855026L;
 
 	/** The GUI components */
-	private JSlider slider;
+	public JSlider slider;
 	private JTextField toleranceTextField;
 	private DecimalFormat df1 = new DecimalFormat("0.000");
 	private float tolerance;
@@ -86,6 +86,20 @@ public class ToleranceSliderPanel extends JPanel implements ChangeListener
 
 	public float getTolerance() {
 		return tolerance;
+	}
+	
+	/** DO NOT USE THIS FUNCTION.  Only for loading splines in the ControlFrame.
+	 *  Behavior unchecked elsewhere!
+	 * 
+	 * @param newTol
+	 */
+	public void setTolerance(float value) {
+		
+		if (log)
+			value = (float) Math.log10(value);
+		value = (value - minValue) / (maxValue - minValue);
+		slider.setValue((int) (value * numTicks));
+		stateChanged(null);
 	}
 
 	public JSlider getSlider() {

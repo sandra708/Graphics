@@ -117,6 +117,9 @@ public class ControlFrame  extends JFrame {
 						                       true),
 						                       "Tolerance"));
 		
+		SplineScreen.tol1= leftTolerance.getTolerance();
+		SplineScreen.tol2= centerTolerance.getTolerance();
+		
 		tolerancePanel.add(leftTolerance);
 		tolerancePanel.add(centerTolerance);
 		tolerancePanel.add(rightTolerance);
@@ -271,6 +274,7 @@ public class ControlFrame  extends JFrame {
 			this.owner= owner;
 		}
 		
+		@SuppressWarnings("resource")
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if(owner == null) return;
@@ -286,30 +290,137 @@ public class ControlFrame  extends JFrame {
 						String line = null;
 						
 						ArrayList<Vector2> firstSplineCP = new ArrayList<Vector2>();
+						boolean firstSplineClosed= true;
+						float firstEpsilon= 0.0f;
 						ArrayList<Vector2> secondSplineCP = new ArrayList<Vector2>();
+						boolean secondSplineClosed= false;
+						float secondEpsilon= 0.0f;
 						
-						boolean firstSpline = true;
-						while ((line = br.readLine()) != null)  
-						{
-						   if(line.charAt(0) != '#') break;
-						   if(line.length() < 3) {firstSpline = false; continue;}
+						float scale= 0.0f;
+						
+						boolean next_line_configs= false;
+						boolean configs_done= false;
+						boolean next_lines_cross_section= false;
+						boolean next_lines_swept_along= false;
+						/* finished is  fail-safe:
+						 *   - 0 for none
+						 *   - 1 for configs parsed
+						 *   - 2 for configs and cross-section
+						 *   - 3 for configs, cross-section, and swept-along
+						 */
+						int finished= 0;// fail-safe: 0 for none, 1 for configs, 
+						while ((line = br.readLine()) != null) {
+							if(line.charAt(0) != '#') {
+								finished++;
+								break;// done parsing all comments
+							}
+							if(next_line_configs) {
+								String[] configs= line.split(" ");
+								// cross-section
+								if(configs[1].equals("true,"))
+									firstSplineClosed= true;
+								else
+									firstSplineClosed= false;
+								try {
+									firstEpsilon= Float.parseFloat(configs[2]);
+								} catch(Exception nf) {
+									System.err.println("Could not parse cross-section epsilon value.");
+									return;
+								}
+								// sweep-along
+								if(configs[4].equals("true,"))
+									secondSplineClosed= true;
+								else
+									secondSplineClosed= false;
+								try {
+									secondEpsilon= Float.parseFloat(configs[5]);
+								} catch(Exception nf) {
+									System.err.println("Could not parse swept-along epsilon value.");
+									return;
+								}
+								// scale
+								try {
+									scale= Float.parseFloat(configs[7]);
+								} catch(Exception nf) {
+									System.err.println("Could not parse the scale of the cross-section.");
+									return;
+								}
+								next_line_configs= false;
+								configs_done= true;
+								finished++;
+								continue;
+							}
+
+							if(line.contains(">>+<<") && !next_line_configs) {
+								next_line_configs= true;
+								continue;
+							}
+							
+							if(line.contains("Cross-section") && configs_done) {
+								next_lines_cross_section= true;
+								continue;
+							}
+							if(line.contains("Swept-along") && configs_done) {
+								next_lines_swept_along= true;
+								continue;
+							}
+						   if(line.length() < 3 && next_lines_cross_section) {
+							   next_lines_cross_section= false;
+							   finished++;
+							   continue;
+						   }
 						   
-						   Vector2 curPoint = new Vector2();
-						   String[] tokens = line.substring(2).split(" ");
-						   
-						   curPoint.x = Float.parseFloat(tokens[0]);
-						   curPoint.y = Float.parseFloat(tokens[1]);
-						   if(firstSpline) firstSplineCP.add(curPoint);
-						   else secondSplineCP.add(curPoint);
+						   // control points!
+						   if(next_lines_cross_section || next_lines_swept_along) {
+							   Vector2 curPoint = new Vector2();
+							   String[] tokens = line.substring(2).split(" ");
+							   try {
+								   curPoint.x = Float.parseFloat(tokens[0]);
+								   curPoint.y = Float.parseFloat(tokens[1]);
+							   } catch(Exception nf) {
+								   System.err.println("Could not parse a control point; line that was a problem: "+line);
+								   return;
+							   }
+							   if(next_lines_cross_section)
+								   firstSplineCP.add(curPoint);
+							   if(next_lines_swept_along)
+								   secondSplineCP.add(curPoint);
+						   }
 						}
-						owner.owner.leftPoints = firstSplineCP;
-						owner.owner.centerPoints = secondSplineCP;
-						((TwoDimSplinePanel)SplineScreen.panels[0]).spline= new BSpline(firstSplineCP, leftClosed, leftTolerance.getTolerance());
-						((TwoDimSplinePanel)SplineScreen.panels[1]).spline= new BSpline(secondSplineCP, centerClosed, centerTolerance.getTolerance());
+						
+						if(finished == 3) {
+							owner.owner.leftPoints = firstSplineCP;
+							owner.owner.centerPoints = secondSplineCP;
+							((TwoDimSplinePanel)SplineScreen.panels[0]).spline= new BSpline(firstSplineCP, firstSplineClosed, firstEpsilon);
+							((TwoDimSplinePanel)SplineScreen.panels[1]).spline= new BSpline(secondSplineCP, secondSplineClosed, secondEpsilon);
+							
+							SplineScreen.tol1= firstEpsilon;
+							owner.leftTolerance.setTolerance(firstEpsilon);
+							
+							SplineScreen.tol2= secondEpsilon;
+							owner.centerTolerance.setTolerance(secondEpsilon);
+							
+							owner.rightTolerance.setTolerance(scale);
+							
+							leftClosed= firstSplineClosed;
+							owner.closeLeft.setSelected(firstSplineClosed);
+							
+							centerClosed= secondSplineClosed;
+							owner.closeCenter.setSelected(secondSplineClosed);
+							
+							owner.owner.scrView.generator.setSplineToSweep(((TwoDimSplinePanel)SplineScreen.panels[0]).spline);
+							owner.owner.scrView.generator.setSplineToSweepAlong(((TwoDimSplinePanel)SplineScreen.panels[1]).spline);
+							owner.owner.scrView.newSweep();
+						} else {
+							System.err.println("Could not load all data, please make sure you are loading a mesh generated with this app and try again.");
+						}
 						
 					}
 				}
-				catch (Exception e1) { e1.printStackTrace(); }
+				catch (Exception e1) {
+					e1.printStackTrace();
+					System.err.println("Could not load all data, please make sure you are loading a mesh generated with this app and try again.");
+				}
 			}
 			else if(src == save) {
 				JFileChooser fileChooser = new JFileChooser();
@@ -333,20 +444,36 @@ public class ControlFrame  extends JFrame {
 				  try {
 					  MeshData myData = new MeshData();
 					  owner.owner.scrView.generator.generate(myData, null);
+					  // preliminary information
+					  pw.write("# This mesh is a \"Sweep Spline\": the comments below describe a Spline (cross-section) swept along\n");
+					  pw.write("# another spline (swept-along) that generated this mesh.\n");
+					  pw.write("#\n");
+					  pw.write("# Cross-section: closed, epsilon >>+<< Swept-along: closed, epsilon >>+<< Scale of Cross-section\n");
+					  pw.write("# "+((TwoDimSplinePanel) SplineScreen.panels[0]).spline.isClosed() + ", " + 
+							  		((TwoDimSplinePanel) SplineScreen.panels[0]).spline.getEpsilon() + " >>+<< " + 
+							  		((TwoDimSplinePanel) SplineScreen.panels[1]).spline.isClosed() + ", " + 
+							  		((TwoDimSplinePanel) SplineScreen.panels[1]).spline.getEpsilon() + " >>+<< " +
+							  		owner.rightTolerance.getTolerance() + "\n");
+					  
+					  // cross-section
+					  pw.write("#\n");
+					  pw.write("# Cross-section Spline control points: \n");
 					  for(Vector2 v : ((TwoDimSplinePanel) SplineScreen.panels[0]).spline.getControlPoints())
 					  {
 						  pw.write("# " + v.x + " " + v.y + "\n");
 					  }
-					  pw.write("# " + "\n");
 					  
+					  // spline swept along
+					  pw.write("# " + "\n");
+					  pw.write("# Swept-along Spline control points:\n");
 					  for(Vector2 v : ((TwoDimSplinePanel) SplineScreen.panels[1]).spline.getControlPoints())
 					  {
 						  pw.write("# " + v.x + " " + v.y + "\n");
 					  }
 					  
-					  pw.close();
-					  
 					  OBJParser.write(pw, OBJParser.convert(myData));
+					  
+					  pw.close();
 					  
 					  
 				  }

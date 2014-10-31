@@ -213,4 +213,8 @@ public class BSpline {
 		 * Then set the data of positions / normals / indices with what you have calculated.
 		 */
 	}
+
+	public float getEpsilon() {
+		return epsilon;
+	}
 }
