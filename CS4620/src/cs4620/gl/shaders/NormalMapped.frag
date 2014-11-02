@@ -5,6 +5,9 @@
 // vec4 getNormalColor(vec2 uv)
 // vec4 getSpecularColor(vec2 uv)
 
+//Object Information
+uniform mat4 mWorld;
+
 // Lighting Information
 const int MAX_LIGHTS = 16;
 uniform int numLights;
@@ -20,19 +23,19 @@ uniform float exposure;
 uniform float shininess;
 
 varying vec4 worldPos;
-varying vec3 fNormal;
-varying vec2 fUV;
 
 void main() {
 	// TODO A4: Implement normal mapping fragment shader
-	vec3 N = normalize(fNormal);
-	vec3 V = normalize(worldCam - worldPos.xyz);
+	//Calculate center of sphere
+	vec4 objCenter = vec4(0.0, 0.0, 0.0, 1.0);
+	vec4 sphereCenter = mWorld * objCenter;
 	
-	vec3 R = V - (2 * dot(V, N) * N);
+	vec3 N = normalize((worldPos - sphereCenter).xyz);
+	float phi = acos(N.z);
+	float theta = atan(N.y / N.x);
+	vec2 UV = vec2(phi, theta);
+	vec4 Inorm = getNormalColor(UV);
+	clamp(Inorm, 0.0, 1.0);
 	
-	Ienv = getEnvironmentColor(R);
-	Ispec = getSpecularColor(fUV) * pow(max(dot(N, H), 0.0), shininess);
-	Ispec = clamp(Ispec, 0.0, 1.0);
-
-	gl_FragColor = Ienv * Ispec * exposure; 
+	gl_FragColor = Inorm * exposure;
 }
