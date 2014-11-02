@@ -25,9 +25,6 @@ varying vec2 fUV;
 void main() {
 	// TODO A4: Implement displacement mapping vertex shader
 	//Calculate displacement
-	//float phi = acos(vNormal.z);
-	//float theta = atan(vNormal.y / vNormal.x);
-	//vec2 nUV = vec2(phi, theta);
 	vec4 dispC = getNormalColor(vUV);
 	float disp = dispMagnitude * (dispC.x + dispC.y + dispC.z) / 3.0;
 	vec3 dispV = vNormal * disp;

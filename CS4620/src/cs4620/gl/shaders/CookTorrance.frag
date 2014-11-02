@@ -44,11 +44,17 @@ void main()
 	  Idiff = clamp(Idiff, 0.0, 1.0);
 
 	  // calculate specular term - Cook-Torrence model
-	  float fresnel = 0.04 + (1.0 - 0.04) * (1.0 - pow(dot(V, H), 5.0));
+	  float fresnel = 0.04 + (0.96 * pow((1.0 - dot(V, H)), 5.0));
+	  
 	  float microfacetExp = (pow(dot(N, H), 2.0) - 1) / (pow(roughness, 2.0) * pow(dot(N, H), 2.0));
+	  
 	  float microfacet = (1.0 / (pow(roughness, 2.0) * pow(dot(N, H), 4.0))) * pow(2.7182818, microfacetExp);
-	  float g = min(1, min((2.0 * dot(N, H) * dot(N, V))/(dot(H, V)), (2.0 * dot(N, H) * dot(N, L))/(dot(H, V))));
+	  
+	  float g = min(dot(V, H), min(2.0 * dot(N, H) * dot(N, V), (2.0 * dot(N, H) * dot(N, L))));
+	  g /= dot(V, H);
+	  
 	  float specCoeff = (fresnel * microfacet * g) / (3.1415927 * dot(N, V) * dot(N, L));
+	  
 	  vec4 Ispec = getSpecularColor(fUV) * specCoeff * max(dot(N, L), 0.0);
 	  Ispec = clamp(Ispec, 0.0, 1.0);
 
