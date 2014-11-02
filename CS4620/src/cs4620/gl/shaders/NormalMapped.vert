@@ -16,6 +16,7 @@ attribute vec3 vNormal; // Sem (NORMAL 0)
 attribute vec2 vUV; // Sem (TEXCOORD 0)
 
 varying vec4 worldPos;
+varying vec2 fUV;
 
 void main() {
 	// TODO A4: Implement normal mapping vertex shader
@@ -23,4 +24,5 @@ void main() {
 	worldPos = mWorld * vPosition;
 	// Calculate Projected Point
 	gl_Position = mViewProjection * worldPos;
+	fUV = vUV;
 }
