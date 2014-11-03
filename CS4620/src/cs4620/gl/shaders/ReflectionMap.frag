@@ -26,7 +26,7 @@ varying vec2 fUV;
 void main() {
 	// TODO A4: Implement reflection mapping fragment shader
 	vec3 N = normalize(fN);
-	vec3 V = normalize(worldCam - worldPos.xyz);
+	vec3 V = normalize(worldPos.xyz - worldCam);
 	
 	vec3 R = V - (2 * dot(V, N) * N);
 	
