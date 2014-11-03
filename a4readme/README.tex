@@ -1,0 +1,29 @@
+\documentclass{letter}
+
+\usepackage{amsmath}
+
+\begin{document}
+
+Alexandra Anderson (aea84) \\
+CS 4620 a4-Shaders \\
+Warmup Exercise
+
+1. Given a viewing direction, how does one compute the reflection direction?
+
+Let $\vec{v}$ be the viewing direction, pointing outward from the surface, $vec{r}$ be the reflection direction likewise outward from the surface, and $vec{n}$ be the normal. We assume all quantities are normalized, and solve for $vec{r}$. 
+
+We know that $\vec{v} + \vec{r}$ is parallel to $\vec{n}$, because $\vec{r}$ is the reflection of $\vec{v}$ across $\vec{n}$. And since both starting vectors are normalized, 
+
+\begin{align*}
+\frac{\vec{v} + \vec{r}}{||\vec{v} + \vec{r}||} &= \vec{n} \\
+\vec{v} + \vec{r} &= (||\vec{v} + \vec{r}||) \vec{n} \\
+\vec{v} + \vec{r} &= 2(\vec{v} \dot \vec{n}) \vec{n} \text{ as dot(v, n) = dot(n, r) and when we sum v + r, } \\
+& \text{we equivalently project each onto n, the direction of the final sum, and then add from there } \\
+\vec{v} + \vec{r} &= 2(\vec{v} \bullet \vec{n}) \vec{n}  \\
+\vec{r} &= 2(\vec{v} \bullet \vec{n}) \vec{n} - \vec{v}
+\end{align*}
+
+So, the reflection vector $\vec{r} = 2(\vec{v} \dot \vec{n}) \vec{n} - \vec{v} $
+
+
+\end{document}
