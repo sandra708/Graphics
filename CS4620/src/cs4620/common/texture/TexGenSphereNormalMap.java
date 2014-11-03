@@ -36,11 +36,11 @@ public class TexGenSphereNormalMap extends ACTextureGenerator {
 		float[] uv = new float[] {u, v};
 		setDiskCoord(uv);
 		
-		double phi = uv[1] * Math.PI;
+		double phi = (1 - uv[1]) * Math.PI;
 		double y = Math.cos(phi);
 		double theta = uv[0] * 2 * Math.PI;
-		double x = Math.cos(theta) * Math.sin(phi);
-		double z = Math.sin(theta) * Math.sin(phi);
+		double x = - Math.sin(theta) * Math.sin(phi);
+		double z = - Math.cos(theta) * Math.sin(phi);
 		
 		Colord color = new Colord(x, y, z);
 		color.normalize();
@@ -57,8 +57,8 @@ public class TexGenSphereNormalMap extends ACTextureGenerator {
 		float vN = uv[1] * resolution;
 		
 		//the nearest disc-center in [0,res] x [0,res] (epsilon for rounding-error)
-		float uR = Math.round(uN + 0.5 - 1e6) - 0.5f;
-		float vR = Math.round(vN + 0.5 - 1e6) - 0.5f;
+		float uR = Math.round(uN);
+		float vR = Math.round(vN);
 		
 		//if out-of-bounds there isn't an actual disc there (shouldn't ever happen)
 		if(uR < 0 || uR > resolution) return;
@@ -68,8 +68,8 @@ public class TexGenSphereNormalMap extends ACTextureGenerator {
 		Vector2 r = new Vector2(uR, vR);
 		
 		//if point within disc, substitute disc-center for normaling purposes
-		float dist = n.sub(r).len();
-		if(dist <= bumpRadius * resolution){
+		float dist = (n.sub(r)).len();
+		if(dist <= bumpRadius){
 			uv[0] = uR / resolution;
 			uv[1] = vR / resolution;
 		}
