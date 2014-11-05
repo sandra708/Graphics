@@ -401,6 +401,7 @@ public class ControlFrame  extends JFrame {
 							owner.centerTolerance.setTolerance(secondEpsilon);
 							
 							owner.rightTolerance.setTolerance(scale);
+							owner.owner.scrView.generator.setScale(scale);
 							
 							leftClosed= firstSplineClosed;
 							owner.closeLeft.setSelected(firstSplineClosed);
