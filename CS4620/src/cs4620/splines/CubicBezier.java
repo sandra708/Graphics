@@ -77,9 +77,51 @@ public class CubicBezier {
     private void tessellate() {
     	 // TODO A5
     	//placeholder code
-    	curvePoints.add(new Vector2(0,0));
-    	curveNormals.add(new Vector2(0,0));
-    	curveTangents.add(new Vector2(0,0));
+    	//curvePoints.add(new Vector2(0,0));
+    	//curveNormals.add(new Vector2(0,0));
+    	//curveTangents.add(new Vector2(0,0));
+    	tesselateHelper(p0, p1, p2, p3, 0);
+    }
+    
+    private void tesselateHelper(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3, int depth){
+    	float theta1 = getAngle(p0, p1, p2);
+    	float theta2 = getAngle(p3, p2, p1);
+    	
+    	if((theta1 < epsilon / 2 && theta2 < epsilon / 2) || depth > 10){
+    		//Set curve points
+    		curvePoints.add(new Vector2(p0)); curvePoints.add(new Vector2(p1)); curvePoints.add(new Vector2(p2)); 
+    		//Set curve tangents: the tangent at p0 is by definition 3(p1 - p0); 
+    		//we calculate the tangents of p1 and p2 as p11-p10 and p12-p11 respectively
+    		Vector2 t0 = (new Vector2(p1)).sub(p0);
+    		Vector2 t1 = interpolate(p2, p1).sub(interpolate(p1, p0));
+    		Vector2 t2 = interpolate(p3, p2).sub(interpolate(p2, p1));
+    		curveTangents.add(new Vector2(t0)); curveTangents.add(new Vector2(t1)); curveTangents.add(new Vector2(t2));
+    		//Set curve normals; we rotate tangents 90 degrees CCW
+    		Matrix3 normal = Matrix3.createRotation((float) (Math.PI / 2.0));
+    		normal.mul(t0); normal.mul(t1); normal.mul(t2);
+    		curveNormals.add(t0); curveNormals.add(t1); curveNormals.add(t2);
+    		return;
+    	}
+    	
+    	Vector2 p10 = interpolate(p0, p1);
+    	Vector2 p11 = interpolate(p1, p2);
+    	Vector2 p12 = interpolate(p2, p3);
+    	
+    	Vector2 p20 = interpolate(p10, p11);
+    	Vector2 p21 = interpolate(p11, p12);
+    	
+    	Vector2 p30 = interpolate(p20, p21);
+    	
+    	tesselateHelper(p0, p10, p20, p30, depth + 1);
+    	tesselateHelper(p30, p21, p12, p3, depth + 1);
+    }
+    
+    private float getAngle(Vector2 p0, Vector2 p1, Vector2 p2){
+    	return (new Vector2(p1)).sub(p0).angle((new Vector2(p2)).sub(p1));
+    }
+    
+    private Vector2 interpolate(Vector2 p, Vector2 q){
+    	return ((new Vector2(p)).add(new Vector2(q))).mul(0.5f);
     }
 	
     
