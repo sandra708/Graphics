@@ -45,7 +45,24 @@ public class CubicBezier {
 		curveNormals = new ArrayList<Vector2>();
 		epsilon = eps;
 		owner = own;
-		//TODO A5
+		
+		Vector4 col0 = new Vector4(1, 0, 0, 0);
+		Vector4 col1 = new Vector4(4, 4, 1, 2);
+		Vector4 col2 = new Vector4(2, 1, 4, 4);
+		Vector4 col3 = new Vector4(0, 0, 0, 1);
+		Matrix4 converter = new Matrix4(col0, col1, col2, col3);
+		converter.transpose();
+		
+		Vector4 xs = new Vector4(bs0.x, bs1.x, bs2.x, bs3.x);
+		Vector4 ys = new Vector4(bs0.y, bs1.y, bs2.y, bs3.y);
+		
+		converter.mul(xs);
+		converter.mul(ys);
+		
+		p0 = new Vector2(xs.x, ys.x);
+		p1 = new Vector2(xs.y, ys.y);
+		p2 = new Vector2(xs.z, ys.z);
+		p3 = new Vector2(xs.w, ys.w);
 		
 		tessellate();
 	}
