@@ -2,6 +2,8 @@ package cs4620.splines;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.lwjgl.BufferUtils;
+
 import cs4620.mesh.MeshData;
 import egl.NativeMem;
 import egl.math.*;
@@ -174,10 +176,29 @@ public class BSpline {
 	 */
 	private void setBeziers() {
 		//TODO A5
-		//placeholder code so this compiles
 		approximationCurves = new ArrayList<CubicBezier>();
-		CubicBezier tmp = new CubicBezier(new Vector2(0,0),new Vector2(0,0),new Vector2(0,0),new Vector2(0,0),0f, this);
-		approximationCurves.add(tmp);
+		Vector2[] pts = new Vector2[3];
+		for(Vector2 ctrl : controlPoints){
+			if(pts[0] == null) pts[0] = ctrl;
+			else if(pts[1] == null) pts[1] = ctrl;
+			else if(pts[2] == null) pts[2] = ctrl;
+			else{
+				addBezier(pts, ctrl);
+			}
+		}
+		if(isClosed){
+			addBezier(pts, controlPoints.get(0)); //the segment right before the "end" of the curve
+			addBezier(pts, controlPoints.get(1)); //the segment that wraps around the ends of the curve
+			addBezier(pts, controlPoints.get(2)); //the segment right after the "beginning" of the curve
+		}
+	}
+	
+	private void addBezier(Vector2[] pts, Vector2 ctrl){
+		CubicBezier bez = new CubicBezier(pts[0], pts[1], pts[2], ctrl, epsilon, this);
+		approximationCurves.add(bez);
+		pts[0] = pts[1];
+		pts[1] = pts[2];
+		pts[2] = ctrl;
 	}
 	
 	/**
@@ -203,6 +224,70 @@ public class BSpline {
 	 */
 	public static void build3DSweep(BSpline crossSection, BSpline sweepCurve, MeshData data, float scale) {
 		//TODO A5
+		ArrayList<Vector2> sweepVertices = new ArrayList<Vector2>();
+		ArrayList<Vector2> sweepTansList = new ArrayList<Vector2>();
+		ArrayList<Vector2> sweepNormsList = new ArrayList<Vector2>();
+		ArrayList<Vector2> crossVertices = new ArrayList<Vector2>();
+		
+		for(CubicBezier bez : crossSection.approximationCurves){
+			crossVertices.addAll(bez.getPoints());
+		} if(crossSection.isClosed()){
+			crossVertices.add(crossVertices.get(0)); //repeat vertex for a seam
+		}
+		
+		for(CubicBezier bez : sweepCurve.approximationCurves){
+			sweepVertices.addAll(bez.getPoints());
+			sweepTansList.addAll(bez.getTangents());
+			sweepNormsList.addAll(bez.getNormals());
+		} if(sweepCurve.isClosed()){ //repeat a seam
+			sweepVertices.add(sweepVertices.get(0));
+			sweepTansList.add(sweepTansList.get(0));
+			sweepNormsList.add(sweepNormsList.get(0));
+		}
+		
+		Vector2[] sweepPos = sweepVertices.toArray(new Vector2[sweepVertices.size()]);
+		Vector2[] sweepTans = sweepTansList.toArray(new Vector2[sweepTansList.size()]);
+		Vector2[] sweepNorms = sweepTansList.toArray(new Vector2[sweepNormsList.size()]);
+		Vector2[] crossPos = crossVertices.toArray(new Vector2[crossVertices.size()]);
+		
+		data.vertexCount = crossPos.length * sweepPos.length;
+		
+		int tris = 2 * (sweepPos.length - 1) * (crossPos.length - 1);
+		data.indexCount = tris * 3;
+		
+		data.positions = BufferUtils.createFloatBuffer(data.vertexCount * 3);
+		data.normals = BufferUtils.createFloatBuffer(data.vertexCount * 3);
+		data.indices = BufferUtils.createIntBuffer(data.indexCount);
+		data.uvs = BufferUtils.createFloatBuffer(data.vertexCount * 2);
+		
+		//map x/y/z of cross-frame into n/t/b of sweep-frame, and then map sweep frame into x-z plane
+		for(int i = 0; i < sweepPos.length; i++){
+			Vector3 posCtr = new Vector3(sweepPos[i].x, 0, sweepPos[i].y);
+			Vector3 tan = new Vector3(sweepTans[i].x, 0, sweepTans[i].y);
+			Vector3 norm = new Vector3(sweepNorms[i].x, 0, sweepNorms[i].y);
+			Vector3 b = (new Vector3(tan)).cross(norm);
+			for(int j = 0; j < crossPos.length; j++){
+				Vector3 disp = (norm.clone()).mul(crossPos[j].y).add(b.clone().mul(crossPos[j].x)).mul(scale);
+				Vector3 pos = (posCtr.clone()).add(disp);
+				data.positions.put(pos.x); data.positions.put(pos.y); data.positions.put(pos.z);
+				//need to do vertex normals: later
+			}
+		}
+		
+		//indices
+		for(int i = 0; i < sweepPos.length - 1; i++){
+			int si = i * crossPos.length;
+			for(int j = 0; j < crossPos.length - 1; j++){
+				data.indices.put(si);
+				data.indices.put(si + crossPos.length);
+				data.indices.put(si + 1);
+				data.indices.put(si + 1);
+				data.indices.put(si + crossPos.length);
+				data.indices.put(si + crossPos.length + 1);
+				si++;
+			}
+		}
+		
 		//Our goal is to fill these arrays. Then we can put them in the buffers properly.
 		
 		

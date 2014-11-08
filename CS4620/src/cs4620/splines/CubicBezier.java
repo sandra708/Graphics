@@ -47,10 +47,10 @@ public class CubicBezier {
 		owner = own;
 		
 		Vector4 col0 = new Vector4(1, 0, 0, 0);
-		Vector4 col1 = new Vector4(4, 4, 1, 2);
-		Vector4 col2 = new Vector4(2, 1, 4, 4);
+		Vector4 col1 = new Vector4(4, 4, 2, 1);
+		Vector4 col2 = new Vector4(1, 2, 4, 4);
 		Vector4 col3 = new Vector4(0, 0, 0, 1);
-		Matrix4 converter = new Matrix4(col0, col1, col2, col3);
+		Matrix4 converter = new Matrix4(col0.mul(1/6.0f), col1.mul(1/6.0f), col2.mul(1/6.0f), col3.mul(1/6.0f));
 		converter.transpose();
 		
 		Vector4 xs = new Vector4(bs0.x, bs1.x, bs2.x, bs3.x);
