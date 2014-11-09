@@ -228,21 +228,21 @@ public class BSpline {
 		ArrayList<Vector2> sweepTansList = new ArrayList<Vector2>();
 		ArrayList<Vector2> sweepNormsList = new ArrayList<Vector2>();
 		ArrayList<Vector2> crossVertices = new ArrayList<Vector2>();
-		ArrayList<Vector2> crossTansList = new ArrayList<Vector2>();
+		ArrayList<Vector2> crossNormsList = new ArrayList<Vector2>();
 		
 		for(CubicBezier bez : crossSection.approximationCurves){
 			crossVertices.addAll(bez.getPoints());
-			crossTansList.addAll(bez.getTangents());
+			crossNormsList.addAll(bez.getNormals());
 		} 
 		
 		if(crossSection.isClosed()){
 			crossVertices.add(crossVertices.get(0).clone()); //repeat vertex for a seam
-			crossTansList.add(crossTansList.get(0).clone());
+			crossNormsList.add(crossNormsList.get(0).clone());
 		}else{
 			//the final control point
 			CubicBezier last = crossSection.approximationCurves.get(crossSection.approximationCurves.size() - 1);
 			crossVertices.add(last.p3.clone()); 
-			crossTansList.add((last.p2.clone()).sub(last.p3));
+			crossNormsList.add((last.p2.clone()).sub(last.p3));
 		}
 		
 		for(CubicBezier bez : sweepCurve.approximationCurves){
@@ -254,7 +254,7 @@ public class BSpline {
 			sweepVertices.add(sweepVertices.get(0).clone());
 			sweepTansList.add(sweepTansList.get(0).clone());
 			sweepNormsList.add(sweepNormsList.get(0).clone());
-		}else{
+		}else{ //add the last point
 			CubicBezier last = sweepCurve.approximationCurves.get(sweepCurve.approximationCurves.size() - 1);
 			sweepVertices.add(last.p3);
 			Vector2 tanL = (last.p3.clone()).sub(last.p2);
@@ -267,7 +267,7 @@ public class BSpline {
 		Vector2[] sweepTans = sweepTansList.toArray(new Vector2[sweepTansList.size()]);
 		Vector2[] sweepNorms = sweepNormsList.toArray(new Vector2[sweepNormsList.size()]);
 		Vector2[] crossPos = crossVertices.toArray(new Vector2[crossVertices.size()]);
-		Vector2[] crossTans = crossTansList.toArray(new Vector2[crossTansList.size()]);
+		Vector2[] crossNorms = crossNormsList.toArray(new Vector2[crossNormsList.size()]);
 		
 		data.vertexCount = crossPos.length * sweepPos.length;
 		
@@ -289,10 +289,10 @@ public class BSpline {
 				Vector3 disp = (norm.clone()).mul(crossPos[j].y).add(b.clone().mul(crossPos[j].x)).mul(scale);
 				Vector3 pos = (posCtr.clone()).add(disp);
 				data.positions.put(pos.x); data.positions.put(pos.y); data.positions.put(pos.z);
-				//normals: must be perpendicular to both tangent lines of the curve (sweep.tan, cross.tan)
-				Vector3 crossTan = (norm.clone()).mul(crossTans[j].y).add(b.clone().mul(crossTans[j].x));
-				Vector3 curveNorm = crossTan.cross(tan);
-				data.normals.put(curveNorm.x); data.normals.put(curveNorm.y); data.normals.put(curveNorm.z);
+				//compute normal (cross-section normal in global frame)
+				Vector3 normC = (norm.clone()).mul(crossNorms[j].y).add(b.clone().mul(crossNorms[j].x));
+				normC.normalize();
+				data.normals.put(normC.x); data.normals.put(normC.y); data.normals.put(normC.z);
 			}
 		}
 		
@@ -309,16 +309,6 @@ public class BSpline {
 				si++;
 			}
 		}
-		
-		//Our goal is to fill these arrays. Then we can put them in the buffers properly.
-		
-		
-		/* Initialize the buffers for data.positions, data.normals, data.indices, and data.uvs as
-		 * you did for A1.  Although you will not be using uv's, you DO need to initialize the
-		 * buffer with space.  Don't forget to initialize data.indexCount and data.vertexCount.
-		 * 
-		 * Then set the data of positions / normals / indices with what you have calculated.
-		 */
 	}
 
 	public float getEpsilon() {

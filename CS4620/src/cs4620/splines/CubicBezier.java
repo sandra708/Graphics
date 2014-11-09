@@ -121,7 +121,7 @@ public class CubicBezier {
     }
     
     private Vector2 interpolate(Vector2 p, Vector2 q){
-    	return ((new Vector2(p)).add(new Vector2(q))).mul(0.5f);
+    	return ((new Vector2(p)).add(q)).mul(0.5f);
     }
 	
     
