@@ -389,16 +389,11 @@ public class ControlFrame  extends JFrame {
 						}
 						
 						if(finished == 3) {
-							owner.owner.leftPoints = firstSplineCP;
-							owner.owner.centerPoints = secondSplineCP;
-							((TwoDimSplinePanel)SplineScreen.panels[0]).spline= new BSpline(firstSplineCP, firstSplineClosed, firstEpsilon);
-							((TwoDimSplinePanel)SplineScreen.panels[1]).spline= new BSpline(secondSplineCP, secondSplineClosed, secondEpsilon);
-							
-							SplineScreen.tol1= firstEpsilon;
 							owner.leftTolerance.setTolerance(firstEpsilon);
+							SplineScreen.tol1= firstEpsilon;
 							
-							SplineScreen.tol2= secondEpsilon;
 							owner.centerTolerance.setTolerance(secondEpsilon);
+							SplineScreen.tol2= secondEpsilon;
 							
 							owner.rightTolerance.setTolerance(scale);
 							owner.owner.scrView.generator.setScale(scale);
@@ -408,6 +403,11 @@ public class ControlFrame  extends JFrame {
 							
 							centerClosed= secondSplineClosed;
 							owner.closeCenter.setSelected(secondSplineClosed);
+							
+							owner.owner.leftPoints = firstSplineCP;
+							owner.owner.centerPoints = secondSplineCP;
+							((TwoDimSplinePanel)SplineScreen.panels[0]).spline= new BSpline(firstSplineCP, firstSplineClosed, firstEpsilon);
+							((TwoDimSplinePanel)SplineScreen.panels[1]).spline= new BSpline(secondSplineCP, secondSplineClosed, secondEpsilon);
 							
 							owner.owner.scrView.generator.setSplineToSweep(((TwoDimSplinePanel)SplineScreen.panels[0]).spline);
 							owner.owner.scrView.generator.setSplineToSweepAlong(((TwoDimSplinePanel)SplineScreen.panels[1]).spline);
