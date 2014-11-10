@@ -1,12 +1,16 @@
 \documentclass{letter}
 
 \usepackage{amsmath}
+\usepackage{graphicx}
+
+\DeclareGraphicsExtensions{.pdf, .png, .jpg}
 
 \begin{document}
 
 Alexandra Anderson (aea84) \\
 CS 4620 \\
-A5-Splines (written portion)
+A5-Splines (written portion) \\
+November 10, 2014
 
 1. a. A curve segment specified with a polynomial of degree n requires n + 1 control points. The original cubic Bezier required 4 control points, but the modified quintic requires 6. 
 
@@ -176,7 +180,7 @@ Now we combine equations and solve for the coefficients of u, our a-vectors.
 0 & 0 & 0 & 0 & \frac{1}{2} & 0 \\
 -26 & -6 & -11 & 1 & -2 & 32 \\
 47 & 17 & 18 & -3 & \frac{5}{2} & -64 \\
--22 & -10 & -8 & 2 & 1 & 32
+-22 & -10 & -8 & 2 & -1 & 32
 \end{bmatrix}
 \begin{bmatrix}
 1 & 0 & 0 & 0 & 0 & 0 \\
@@ -210,7 +214,7 @@ Now we combine equations and solve for the coefficients of u, our a-vectors.
 -1 & 0 & 0 & 0 & 1 & 0 \\
 11 & -33 & -3 & -3 & -4 & 32 \\
 -12 & 54 & 9 & 8 & 5 & -64 \\
-0 & 24 & -6 & -4 & 2 & 32 \\
+4 & 24 & -6 & -4 & -2 & 32 \\
 \end{bmatrix}
 \begin{bmatrix}
 \vec{p_0} \\
@@ -253,7 +257,7 @@ f(u) =
 -1 & 0 & 0 & 0 & 1 & 0 \\
 11 & -33 & -3 & -3 & -4 & 32 \\
 -12 & 54 & 9 & 8 & 5 & -64 \\
-0 & 24 & -6 & -4 & 2 & 32 \\
+4 & -24 & -6 & -4 & -2 & 32 \\
 \end{bmatrix}
 \begin{bmatrix}
 \vec{p_0} \\
@@ -274,11 +278,13 @@ $$A =
 -1 & 0 & 0 & 0 & 1 & 0 \\
 11 & -33 & -3 & -3 & -4 & 32 \\
 -12 & 54 & 9 & 8 & 5 & -64 \\
-0 & 24 & -6 & -4 & 2 & 32 \\
+4 & -24 & -6 & -4 & -2 & 32 \\
 \end{bmatrix}
 $$
 
-c. [Insert Graph Here]
+c. The basis graph shows $p_0, p_1, ... , p_6$ in the colors of the rainbow, with $p_0$ in red, $p_1$ in orange, and so on, to $p_5$ in purple. 
+
+\includegraphics{basis-graph}
 
 2. Find a matrix $M$ such that if $P_{Bez} = MP_{Bsp}$, then $f_{Bez}(u) = f_{Bsp}(u) \forall u$. 
 
@@ -359,5 +365,11 @@ M &=
 0 & 1 & 4 & 1
 \end{bmatrix}
 \end{align*}
+
+b. The graph is as follows, with the blue for b-Spline points and the red for converted Bezier points. 
+
+ \includegraphics{bezier-plot4}
+ 
+ % [width=400pt]
 
 \end{document}
