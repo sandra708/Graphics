@@ -238,11 +238,6 @@ public class BSpline {
 		if(crossSection.isClosed()){
 			crossVertices.add(crossVertices.get(0).clone()); //repeat vertex for a seam
 			crossNormsList.add(crossNormsList.get(0).clone());
-		}else{
-			//the final control point
-			CubicBezier last = crossSection.approximationCurves.get(crossSection.approximationCurves.size() - 1);
-			crossVertices.add(last.p3.clone()); 
-			crossNormsList.add((last.p2.clone()).sub(last.p3));
 		}
 		
 		for(CubicBezier bez : sweepCurve.approximationCurves){
@@ -254,13 +249,6 @@ public class BSpline {
 			sweepVertices.add(sweepVertices.get(0).clone());
 			sweepTansList.add(sweepTansList.get(0).clone());
 			sweepNormsList.add(sweepNormsList.get(0).clone());
-		}else{ //add the last point
-			CubicBezier last = sweepCurve.approximationCurves.get(sweepCurve.approximationCurves.size() - 1);
-			sweepVertices.add(last.p3);
-			Vector2 tanL = (last.p3.clone()).sub(last.p2);
-			sweepTansList.add(tanL.clone());
-			Matrix3.createRotation((float) (Math.PI / 2)).mul(tanL);
-			sweepNormsList.add(tanL);
 		}
 		
 		Vector2[] sweepPos = sweepVertices.toArray(new Vector2[sweepVertices.size()]);

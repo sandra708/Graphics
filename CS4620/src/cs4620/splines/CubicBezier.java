@@ -90,16 +90,12 @@ public class CubicBezier {
     	if((theta1 < epsilon / 2 && theta2 < epsilon / 2) || depth > 10){
     		//Set curve points
     		curvePoints.add(new Vector2(p0)); //curvePoints.add(new Vector2(p1)); curvePoints.add(new Vector2(p2)); 
-    		//Set curve tangents: the tangent at p0 is by definition 3(p1 - p0); 
-    		//we calculate the tangents of p1 and p2 as p11-p10 and p12-p11 respectively
+    		//Set curve tangents: the tangent at p0 is by definition normalize(p1 - p0); 
     		Vector2 t0 = (new Vector2(p1)).sub(p0).normalize();
-    		//Vector2 t1 = interpolate(p2, p1).sub(interpolate(p1, p0)).normalize();
-    		//Vector2 t2 = interpolate(p3, p2).sub(interpolate(p2, p1)).normalize();
-    		curveTangents.add(new Vector2(t0)); //curveTangents.add(new Vector2(t1)); curveTangents.add(new Vector2(t2));
-    		//Set curve normals; we rotate tangents 90 degrees CCW
+    		curveTangents.add(new Vector2(t0)); 
     		Matrix3 normal = Matrix3.createRotation((float) (-Math.PI / 2.0));
-    		normal.mul(t0); //normal.mul(t1); normal.mul(t2);
-    		curveNormals.add(t0); //curveNormals.add(t1); curveNormals.add(t2);
+    		normal.mul(t0); 
+    		curveNormals.add(t0); 
     		return;
     	}
     	
