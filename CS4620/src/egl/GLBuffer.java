@@ -591,7 +591,7 @@ public class GLBuffer implements IDisposable {
         init();
         setElementFormat(GLType.Float, vecDim);
         setTarget(BufferTarget.ArrayBuffer);
-        smartSetData(data, 0, 0);
+        smartSetData(data, data.length, 0);
         return this;
     }
     /**
@@ -602,7 +602,7 @@ public class GLBuffer implements IDisposable {
     public GLBuffer initAsIndex(int[] data) {
         init();
         setAsIndexInt();
-        smartSetData(data, 0, 0);
+        smartSetData(data, data.length, 0);
         return this;
     }
     /**
@@ -613,7 +613,7 @@ public class GLBuffer implements IDisposable {
     public GLBuffer initAsIndex(short[] data) {
         init();
         setAsIndexShort();
-        smartSetData(data, 0, 0);
+        smartSetData(data, data.length, 0);
         return this;
     }
     
