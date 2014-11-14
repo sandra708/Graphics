@@ -96,6 +96,10 @@ public class Renderer implements IDisposable {
 			}
 
 			mesh.vBuffer.useAsAttrib(material.shaderInterface);
+			mesh.vBufferTangentSpace.useAsAttrib(material.shaderInterfaceTangentSpace);
+			if(mesh.vBufferSkinned.getIsCreated()) {
+				mesh.vBufferSkinned.useAsAttrib(material.shaderInterfaceSkinned);
+			}
 			for(RenderObject ro : p.objects) {
 				material.useObject(ro);
 				GL11.glDrawElements(PrimitiveType.Triangles, mesh.indexCount, GLType.UnsignedInt, 0);

@@ -37,18 +37,15 @@ void main() {
 
 	  // calculate diffuse term
 	  vec4 Idiff = getDiffuseColor(fUV) * max(dot(N, L), 0.0);
-	  Idiff = clamp(Idiff, 0.0, 1.0);
 
 	  // calculate specular term
 	  vec4 Ispec = getSpecularColor(fUV) * pow(max(dot(N, H), 0.0), shininess);
-	  Ispec = clamp(Ispec, 0.0, 1.0);
-	  
-	  // calculate ambient term
-	  vec4 Iamb = getDiffuseColor(fUV);
-	  Iamb = clamp(Iamb, 0.0, 1.0);
 
-	  finalColor += vec4(lightIntensity[i], 0.0) * (Idiff + Ispec) / (r*r) + vec4(ambientLightIntensity, 0.0) * Iamb;
+	  finalColor += vec4(lightIntensity[i], 0.0) * (Idiff + Ispec) / (r*r);
 	}
 
-	gl_FragColor = finalColor * exposure; 
+	// calculate ambient term
+	vec4 Iamb = getDiffuseColor(fUV);
+	
+	gl_FragColor = (finalColor + vec4(ambientLightIntensity, 0.0) * Iamb) * exposure; 
 }

@@ -40,7 +40,7 @@ public class SplineScreen extends GameScreen {
 	static SplinePanel[] panels;
 	static SplinePanel selectedPanel;
 	
-	MeshGenSweepSpline generator;
+	public MeshGenSweepSpline generator;
 	
 	Renderer renderer = new Renderer();
 	int cameraIndex = 0;
@@ -133,22 +133,28 @@ public class SplineScreen extends GameScreen {
 		@Override
 		public void receive(Object sender, MouseButtonEventArgs args) {
 			int index = (int) Math.floor(Mouse.getX() / SplinePanel.panelWidth);
-			if (index >= 0 && index < panels.length && panels[index] != null && panels[index] instanceof TwoDimSplinePanel) {
-				TwoDimSplinePanel p= (TwoDimSplinePanel)panels[index];
-				if (args.button == 1) {
-					p.selectWithMouse(Mouse.getX(), Mouse.getY());
-					selectedPanel = panels[index];
-				} else if (args.button == 2) {
-					int selectedIndex = p.getSelectedWithMouseClick(Mouse.getX(), Mouse.getY());
-					if (selectedIndex == -1) {
-						p.spline.addControlPoint(p.mouseClickToWorldTransform(Mouse.getX(), Mouse.getY()));
-					} else {
-						p.spline.removeControlPoint(selectedIndex);
+			if (index >= 0 && index < panels.length && panels[index] != null) {
+				if(panels[index] instanceof TwoDimSplinePanel) {
+					TwoDimSplinePanel p= (TwoDimSplinePanel)panels[index];
+					if (args.button == 1) {
+						p.selectWithMouse(Mouse.getX(), Mouse.getY());
+						selectedPanel = panels[index];
+					} else if (args.button == 2) {
+						int selectedIndex = p.getSelectedWithMouseClick(Mouse.getX(), Mouse.getY());
+						if (selectedIndex == -1) {
+							p.spline.addControlPoint(p.mouseClickToWorldTransform(Mouse.getX(), Mouse.getY()));
+						} else {
+							p.spline.removeControlPoint(selectedIndex);
+						}
 					}
+					if(ControlFrame.REAL_TIME)
+						newSweep();
+				} else if(panels[index] instanceof SweepSplinePanel) {
+					selectedPanel= panels[index];
+					((SweepSplinePanel) selectedPanel).clickStartedHere= true;
 				}
 				
-				if(ControlFrame.REAL_TIME)
-					newSweep();
+				
 			}
 		}
 	};
@@ -172,6 +178,9 @@ public class SplineScreen extends GameScreen {
 				selectedPanel = null;
 				if(ControlFrame.REAL_TIME)
 					newSweep();
+			} else if(selectedPanel instanceof SweepSplinePanel) {
+				((SweepSplinePanel) selectedPanel).clickStartedHere= false;
+				selectedPanel= null;
 			}
 		}
 	};

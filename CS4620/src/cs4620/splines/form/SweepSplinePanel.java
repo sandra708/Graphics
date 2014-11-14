@@ -37,6 +37,7 @@ public class SweepSplinePanel extends SplinePanel {
 		
 		if(owner.camController.camera != null){
 			owner.renderer.draw(owner.camController.camera, owner.rController.env.lights, RasterizerState.CULL_NONE);
+			
 			if (owner.showGrid)
 				owner.gridRenderer.draw(owner.camController.camera);
 		}

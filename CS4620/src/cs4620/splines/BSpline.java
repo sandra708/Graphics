@@ -134,6 +134,10 @@ public class BSpline {
 		setBeziers();
 	}
 	
+	public float getEpsilon() {
+		return epsilon;
+	}
+	
 	/**
 	 * Returns the sequence of normals on this BSpline specified by the sequence of approximation curves
 	 */
@@ -212,9 +216,5 @@ public class BSpline {
 		 * 
 		 * Then set the data of positions / normals / indices with what you have calculated.
 		 */
-	}
-
-	public float getEpsilon() {
-		return epsilon;
 	}
 }

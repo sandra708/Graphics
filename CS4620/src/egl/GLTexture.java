@@ -201,7 +201,7 @@ public class GLTexture implements IDisposable {
 		} 
     	catch (Exception e) {
     		// The Apocalypse Has Begun. Quick... Hide In The Garage!
-    		// Update: This Error Has Occurred. We Are All ....!!!
+    		// Update: This Error Has Occurred. We Are All FUCKED!!!
 		}
     }
     public void setImage(int w, int h, int pixelFormat, int pixelType, ByteBuffer buf, boolean mipMap) {

@@ -3,7 +3,6 @@ package cs4620.splines.form;
 import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
 
 import cs4620.splines.BSpline;
 import egl.math.Vector2;

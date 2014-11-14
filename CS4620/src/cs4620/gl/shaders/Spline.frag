@@ -26,7 +26,7 @@ varying vec4 worldPos; // vertex position in world coordinates
 void main() {
 	// interpolating normals will change the length of the normal, so renormalize the normal.
 	vec3 N = normalize(fN);
-	vec3 V = normalize(worldCam-worldPos.xyz);
+	vec3 V = normalize(worldPos.xyz - worldCam);
 	
 	
 	vec4 baseColor;
