@@ -43,6 +43,7 @@ public class ViewScreen extends GameScreen {
 	int prevCamScroll = 0;
 	boolean wasPickPressedLast = false;
 	boolean showGrid = true;
+	boolean useTimelineMouseOver = true;
 	
 	SceneApp app;
 	ScenePanel sceneTree;
@@ -143,6 +144,9 @@ public class ViewScreen extends GameScreen {
 				break;
 			case Keyboard.KEY_BACKSLASH:
 				animator.togglePlaying();
+				break;
+			case Keyboard.KEY_APOSTROPHE:
+				useTimelineMouseOver = !useTimelineMouseOver;
 				break;
 			default:
 				break;
@@ -267,7 +271,7 @@ public class ViewScreen extends GameScreen {
 				game.getWidth(), game.getHeight(),
 				rController.animEngine,
 				co == null ? "" : co.sceneObject.getID().name,
-				Mouse.getY() < 40, (float)gameTime.elapsed);
+				Mouse.getY() < 40 || !useTimelineMouseOver, (float)gameTime.elapsed);
 		
         GLError.get("draw");
 	}
