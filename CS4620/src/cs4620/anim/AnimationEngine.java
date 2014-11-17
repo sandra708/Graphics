@@ -142,6 +142,9 @@ public class AnimationEngine {
 	 * Sent Through The Scene Notifying Everyone Of The Change
 	 */
 	public void updateTransformations() {
+		for(SceneObject o: scene.objects){
+			AnimTimeline time = timelines.get(o.getID().name);
+		}
 		// TODO: Loop Through All The Timelines
 		// And Update Transformations Accordingly
 		// (You WILL Need To Use this.scene)
