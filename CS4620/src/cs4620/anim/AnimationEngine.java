@@ -5,7 +5,10 @@ import java.util.HashMap;
 import cs4620.common.Scene;
 import cs4620.common.SceneObject;
 import cs4620.common.event.SceneTransformationEvent;
+import egl.math.Matrix3;
 import egl.math.Matrix4;
+import egl.math.Quat;
+import egl.math.Vector3;
 
 /**
  * A Component Resting Upon Scene That Gives
@@ -144,9 +147,48 @@ public class AnimationEngine {
 	public void updateTransformations() {
 		for(SceneObject o: scene.objects){
 			AnimTimeline time = timelines.get(o.getID().name);
+			AnimKeyframe prev = time.frames.ceiling(new AnimKeyframe(curFrame));
+			AnimKeyframe next = time.frames.floor(new AnimKeyframe(curFrame));
+			Matrix4 transformation = interpolate(prev, next);
+			o.transformation.set(transformation);
 		}
 		// TODO: Loop Through All The Timelines
 		// And Update Transformations Accordingly
 		// (You WILL Need To Use this.scene)
+	}
+	
+	//does not modify the parameters: calculates the transformation matrix
+	private Matrix4 interpolate(AnimKeyframe prev, AnimKeyframe next){
+		float u = (curFrame - prev.frame) / ((float) (next.frame - prev.frame));
+		
+		Vector3 t1 = prev.transformation.getTrans();
+		Matrix3 r1 = new Matrix3();
+		Matrix3 s1 = new Matrix3();
+		
+		Vector3 t2 = next.transformation.getTrans();
+		Matrix3 r2 = new Matrix3();
+		Matrix3 s2 = new Matrix3();
+		
+		Vector3 t0 = (t1.mul(1 - u).add(t2.mul(u))).mul(0.5f);
+		
+		prev.transformation.getAxes().polar_decomp(r1, s1);
+		next.transformation.getAxes().polar_decomp(r2, s2);
+		Matrix3 s0 = s1.interpolate(s1, s2, u);
+		Matrix3 r0 = getRotation(new Quat(r1), new Quat(r2), u);
+		
+		return Matrix4.createTranslation(t0).mulBefore(new Matrix4(r0)).mulBefore(new Matrix4(s0));
+	}
+	
+	//calculates the spherically interpolated rotation matrix
+	private Matrix3 getRotation(Quat q1, Quat q2, float u){
+		Quat dotHelp = (q1.clone()).mul(q2);
+		double theta = dotHelp.x + dotHelp.y + dotHelp.z + dotHelp.w;
+		
+		float f1 = (float) (Math.sin((1 - u) * theta) / Math.sin(theta));
+		float f2 = (float) (Math.sin(u * theta) / Math.sin(theta));
+		
+		Quat q0 = (q1.clone()).mul(f1, f1, f1, f1).add((q2.clone()).mul(f2, f2, f2, f2));
+		
+		return q0.toRotationMatrix(new Matrix3());
 	}
 }
