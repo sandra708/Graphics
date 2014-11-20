@@ -203,7 +203,7 @@ public class RenderMaterial implements IDisposable {
 		// Cube map
 		unCubeMap = program.getUniform("cubeMap");
 		//TexCubeMap.setupCubeMap(unCubeMap, "data/textures/Envir/");
-		env.cubemap.bindCubemap(unCubeMap);
+		env.cubemap.use(TextureUnit.Texture3, unCubeMap);
 		
 		createInputProviders(env);
 	}
