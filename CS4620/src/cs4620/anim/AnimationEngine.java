@@ -149,10 +149,7 @@ public class AnimationEngine {
 		for(SceneObject o: scene.objects){
 			AnimTimeline time = timelines.get(o.getID().name);
 			if(time == null){
-				int x = 3;
-			}
-			if(time.frames == null){
-				int y = 7;
+				continue;
 			}
 			AnimKeyframe prev = time.frames.ceiling(new AnimKeyframe(curFrame));
 			AnimKeyframe next = time.frames.floor(new AnimKeyframe(curFrame));
@@ -174,7 +171,7 @@ public class AnimationEngine {
 	//does not modify the parameters: calculates the transformation matrix
 	private Matrix4 interpolate(AnimKeyframe prev, AnimKeyframe next){
 		float u = (curFrame - prev.frame) / ((float) (next.frame - prev.frame));
-		
+		if(next.frame == prev.frame) u = 0;
 		Vector3 t1 = prev.transformation.getTrans();
 		Matrix3 r1 = new Matrix3();
 		Matrix3 s1 = new Matrix3();
