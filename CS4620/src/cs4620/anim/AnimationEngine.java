@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import cs4620.common.Scene;
 import cs4620.common.SceneObject;
+import cs4620.common.event.SceneEvent;
 import cs4620.common.event.SceneTransformationEvent;
 import egl.math.Matrix3;
 import egl.math.Matrix4;
@@ -147,10 +148,23 @@ public class AnimationEngine {
 	public void updateTransformations() {
 		for(SceneObject o: scene.objects){
 			AnimTimeline time = timelines.get(o.getID().name);
+			if(time == null){
+				int x = 3;
+			}
+			if(time.frames == null){
+				int y = 7;
+			}
 			AnimKeyframe prev = time.frames.ceiling(new AnimKeyframe(curFrame));
 			AnimKeyframe next = time.frames.floor(new AnimKeyframe(curFrame));
+			if(next == null){
+				next = time.frames.last();
+			}
+			if(prev == null){
+				prev = time.frames.first();
+			}
 			Matrix4 transformation = interpolate(prev, next);
 			o.transformation.set(transformation);
+			scene.sendEvent(new SceneTransformationEvent(o));
 		}
 		// TODO: Loop Through All The Timelines
 		// And Update Transformations Accordingly
@@ -181,13 +195,13 @@ public class AnimationEngine {
 	
 	//calculates the spherically interpolated rotation matrix
 	private Matrix3 getRotation(Quat q1, Quat q2, float u){
-		Quat dotHelp = (q1.clone()).mul(q2);
-		double theta = dotHelp.x + dotHelp.y + dotHelp.z + dotHelp.w;
+		double theta = q1.x * q2.x + q1.y * q2.y + q1.z * q2.z + q1.w * q2.w;
 		
 		float f1 = (float) (Math.sin((1 - u) * theta) / Math.sin(theta));
 		float f2 = (float) (Math.sin(u * theta) / Math.sin(theta));
-		
-		Quat q0 = (q1.clone()).mul(f1, f1, f1, f1).add((q2.clone()).mul(f2, f2, f2, f2));
+		Quat q11 = (new Quat(q1)).setScaled(f1, new Quat(q1));
+		Quat q21 = (new Quat(q2)).setScaled(f2, new Quat(q2));
+		Quat q0 = (q11).add(q21);
 		
 		return q0.toRotationMatrix(new Matrix3());
 	}
