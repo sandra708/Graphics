@@ -86,7 +86,7 @@ public class AnimationEngine {
 	 */
 	public void moveToFrame(int f) {
 		if(f < frameStart) f = frameStart;
-		else if(f < frameEnd) f = frameEnd;
+		else if(f > frameEnd) f = frameEnd;
 		curFrame = f;
 	}
 	/**

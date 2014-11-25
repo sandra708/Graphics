@@ -372,10 +372,18 @@ public class Quatd extends AbstractList<Double> implements Cloneable {
 	 */
 	public Vector4d toAxisAngle(Vector4d aa) {
 		double l = Math.sqrt(x * x + y * y + z * z);
-		aa.w = Math.asin(l);
-		aa.x = x / l;
-		aa.y = y / l;
-		aa.z = z / l;
+		double u = Math.atan2(l, w);
+		aa.w = 2 * u;
+		if(l < 0.001) {
+			aa.x = 0;
+			aa.y = 1;
+			aa.z = 0;
+		}
+		else {
+			aa.x = (x / l);
+			aa.y = (y / l);
+			aa.z = (z / l);
+		}
 		return aa;
 	}
 	/**

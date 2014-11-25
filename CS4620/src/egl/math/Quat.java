@@ -373,10 +373,18 @@ public class Quat extends AbstractList<Float> implements Cloneable {
 	 */
 	public Vector4 toAxisAngle(Vector4 aa) {
 		double l = Math.sqrt(x * x + y * y + z * z);
-		aa.w = (float)Math.asin(l);
-		aa.x = (float)(x / l);
-		aa.y = (float)(y / l);
-		aa.z = (float)(z / l);
+		double u = Math.atan2(l, w);
+		aa.w = (float)(2 * u);
+		if(l < 0.001) {
+			aa.x = 0f;
+			aa.y = 1f;
+			aa.z = 0f;
+		}
+		else {
+			aa.x = (float)(x / l);
+			aa.y = (float)(y / l);
+			aa.z = (float)(z / l);
+		}
 		return aa;
 	}
 	/**
@@ -549,6 +557,10 @@ public class Quat extends AbstractList<Float> implements Cloneable {
 	 * @param args Ummm... No
 	 */
 	public static void main(String[] args) {
+		Quat qAA = createRotationX(0.4f);
+		Vector4 aa = qAA.toAxisAngle(new Vector4());
+		System.out.println(aa);
+		
 		Quat q = createRotationX(Util.PIf / 2);
 		Matrix3 r = q.toRotationMatrix(new Matrix3());
 		Vector3 v = new Vector3(0, 0, -1);

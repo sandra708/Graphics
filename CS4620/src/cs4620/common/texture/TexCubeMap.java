@@ -65,11 +65,11 @@ public class TexCubeMap {
 		created = true;
 	}
 	
-	public boolean bindCubemap(int unCubeMap) {
+	public boolean use(int textureUnit, int unCubeMap) {
 		if(unCubeMap != GL.BadUniformLocation && created) {
-			glActiveTexture(uintTexCube);
+			glActiveTexture(textureUnit);
 			glBindTexture(TextureTarget.TextureCubeMap, uintTexCube);
-			glUniform1i(unCubeMap, uintTexCube);
+			glUniform1i(unCubeMap, textureUnit - TextureUnit.Texture0);
 			return true;
 		}
 		return false;
