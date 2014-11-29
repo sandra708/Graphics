@@ -89,7 +89,7 @@ public abstract class Surface {
 	
 	/** Given two opposite corners of the bounding box,
 	 * 	computes the minimum and maximum corners, as well
-	 * 	as the average center, and stores.
+	 * 	as the center of the box as the surface average, and stores.
 	 * 
 	 * @param minW some corner of the bounding box
 	 * @param maxW the corner precisely opposite to minW

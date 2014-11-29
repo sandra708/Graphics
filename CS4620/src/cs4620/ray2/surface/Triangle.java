@@ -141,16 +141,18 @@ public class Triangle extends Surface {
 		
 		double[] maxs = new double[3];
 		double[] mins = new double[3];
+		double[] avgs = new double[3];
 		
 		for(int i = 0; i < 3; i++){
 			mins[i] = Math.min(v0.get(i), Math.min(v1.get(i), v2.get(i)));
 			maxs[i] = Math.max(v0.get(i), Math.max(v1.get(i), v2.get(i)));
+			avgs[i] = (v0.get(i) + v1.get(i) + v2.get(i)) / 3;
 		}
 		
 		minBound = new Vector3d(mins[0], mins[1], mins[2]);
 		maxBound = new Vector3d(maxs[0], maxs[1], maxs[2]);
 		
-		averagePosition = new Vector3d((mins[0]+ maxs[0])/2.0, (mins[1]+ maxs[1])/2.0, (mins[2]+ maxs[2])/2.0);
+		averagePosition = new Vector3d(avgs[0], avgs[1], avgs[2]);
 		// TODO#A7: Compute the bounding box and store the result in
 		// averagePosition, minBound, and maxBound.
 	}
