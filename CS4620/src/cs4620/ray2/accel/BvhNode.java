@@ -83,9 +83,14 @@ public class BvhNode {
 	 * @return true if ray intersects the bounding box
 	 */
 	public boolean intersects(Ray ray) {
+		//minPoint < p + vt < maxpoint
+		//vt > minPt - p && vt < maxPt - p && t > start && t < end
+		Vector3d tMin = (new Vector3d(minBound)).sub(ray.origin).div(ray.direction);
+		Vector3d tMax = (new Vector3d(maxBound)).sub(ray.origin).div(ray.direction);
+		double tS = Math.max(Math.max(tMin.x, tMin.y), Math.max(tMin.z, ray.start));
+		double tE = Math.min(Math.min(tMax.x, tMax.y), Math.min(tMax.z, ray.end));
+		return tS < tE;
 		// TODO#A7: fill in this function.
 		// Check whether the given ray intersects the AABB of this BvhNode
-
-		return true;
 	}
 }
