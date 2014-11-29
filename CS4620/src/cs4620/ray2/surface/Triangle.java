@@ -131,6 +131,26 @@ public class Triangle extends Surface {
 	}
 
 	public void computeBoundingBox() {
+		Vector3d v0 = new Vector3d(owner.getPosition(index.x));
+		Vector3d v1 = new Vector3d(owner.getPosition(index.y));
+		Vector3d v2 = new Vector3d(owner.getPosition(index.z));
+		
+		tMat.mulPos(v0);
+		tMat.mulPos(v1);
+		tMat.mulPos(v2);
+		
+		double[] maxs = new double[3];
+		double[] mins = new double[3];
+		
+		for(int i = 0; i < 3; i++){
+			mins[i] = Math.min(v0.get(i), Math.min(v1.get(i), v2.get(i)));
+			maxs[i] = Math.max(v0.get(i), Math.max(v1.get(i), v2.get(i)));
+		}
+		
+		minBound = new Vector3d(mins[0], mins[1], mins[2]);
+		maxBound = new Vector3d(maxs[0], maxs[1], maxs[2]);
+		
+		averagePosition = new Vector3d((mins[0]+ maxs[0])/2.0, (mins[1]+ maxs[1])/2.0, (mins[2]+ maxs[2])/2.0);
 		// TODO#A7: Compute the bounding box and store the result in
 		// averagePosition, minBound, and maxBound.
 	}

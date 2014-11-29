@@ -7,7 +7,10 @@ import org.lwjgl.BufferUtils;
 import cs4620.mesh.MeshData;
 import cs4620.ray2.IntersectionRecord;
 import cs4620.ray2.Ray;
+import egl.math.Vector3;
 import egl.math.Vector3d;
+import egl.math.Vector4;
+import egl.math.Vector4d;
 
 /**
  * A class that represents an Axis-Aligned box. When the scene is built, the Box
@@ -68,6 +71,10 @@ public class Box extends Surface {
 	}
 
 	public void computeBoundingBox() {
+		if(minPt == null || maxPt == null) return;
+		Vector3d minW = tMat.mulPos(new Vector3d(minPt));
+		Vector3d maxW = tMat.mulPos(new Vector3d(maxPt));
+		setBoundingBox(minW, maxW);
 		// TODO#A7: Compute the bounding box and store the result in
 		// averagePosition, minBound, and maxBound.
 		// Hint: The bounding box is not the same as just minPt and maxPt,

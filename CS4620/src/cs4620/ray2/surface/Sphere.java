@@ -104,6 +104,10 @@ public class Sphere extends Surface {
 	}
 
 	public void computeBoundingBox() {
+		Vector3d minW = tMat.mulPos((new Vector3d(center)).add(-1f));
+		Vector3d maxW = tMat.mulPos((new Vector3d(center)).add(1f));
+		setBoundingBox(minW, maxW);
+		averagePosition = tMat.mulPos(new Vector3d(center));
 		// TODO#A7: Compute the bounding box and store the result in
 		// averagePosition, minBound, and maxBound.
 

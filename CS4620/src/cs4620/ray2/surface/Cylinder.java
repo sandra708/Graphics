@@ -146,6 +146,12 @@ public class Cylinder extends Surface {
 		  }
 
 	public void computeBoundingBox() {
+		Vector3d minW = (new Vector3d(center)).add(radius * -1, radius * -1, 0);
+		Vector3d maxW = (new Vector3d(center)).add(radius, radius, height);
+		tMat.mulPos(maxW);
+		tMat.mulPos(minW);
+		setBoundingBox(minW, maxW);
+		
 		// TODO#A7: Compute the bounding box and store the result in
 		// averagePosition, minBound, and maxBound.
 		// Hint: The bounding box may be transformed by a transformation matrix.
