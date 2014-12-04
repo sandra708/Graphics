@@ -43,6 +43,24 @@ public class Glass extends Shader {
 	 */
 	@Override
 	public void shade(Colord outIntensity, Scene scene, Ray ray, IntersectionRecord record, int depth) {
+		outIntensity.setZero();
+		//useful vectors
+		Vector3d normal = record.normal;
+		Vector3d view = (new Vector3d(ray.direction)).negate();
+		Vector3d reflectDir = ((new Vector3d(normal)).mul(2).mul(normal.dot(view))).sub(view);
+		double r = fresnel(normal, reflectDir, refractiveIndex);
+		double thetaL;
+		double thetaR;
+		
+		//reflective portion
+		Colord reflC = new Colord();
+		
+		//refractive portion
+		Colord refrC = new Colord();
+		
+		//combination
+		outIntensity.add(reflC.mul(1 - r)).add(refrC.mul(r));
+		
 		// TODO#A7: fill in this function.
 		
 

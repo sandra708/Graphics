@@ -323,7 +323,6 @@ public class RayTracer {
 		// Do some basic setup
 		Ray ray = new Ray();
 		Colord pixelColor = new Colord();
-		Colord rayColor = new Colord();
 
 		// Set the camera aspect ratio to match output image
 		int width = outImage.getWidth();
@@ -345,26 +344,21 @@ public class RayTracer {
 				// TODO#A7 Implement supersampling for antialiasing.
 				// Each pixel should have (samples*samples) subpixels.
 				Ray[][] rays = new Ray[samples][samples];
-				Colord[][] rayColors = new Colord[samples][samples];
+				//Colord[][] rayColors = new Colord[samples][samples];
 				for(int i = 0; i < samples; i++){
 					for(int j = 0; j < samples; j++){
 						rays[i][j] = new Ray();
 						cam.getRay(rays[i][j], ((i / samples) + x) / (width), ((j / samples) + y) / (height));
-						rayColors[i][j] = new Colord();
-						shadeRay(rayColors[i][j], scene, ray, 1);
+						Colord sampleColor = new Colord();
+						shadeRay(sampleColor, scene, ray, 1);
+						pixelColor.add(sampleColor);
 					}
 				}
 				
-				//TODO#A7 - anti-alias the large quantities of color
-				
-				pixelColor.add(rayColor);
-			
-					
+				pixelColor.mul(1f/(samples* samples));	
 				pixelColor.mul(exposure);
-
 				
 				outImage.setPixelColor(pixelColor, x, y);
-
 			}
 		}
 	}

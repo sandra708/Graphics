@@ -65,8 +65,19 @@ public abstract class Shader {
 	
 	protected double fresnel(Vector3d normal, Vector3d outgoing, double refractiveIndex) {
 		//TODO#A7 compute the fresnel term using the equation in the lecture
-
-		double R = 1;
-		return R;
+		
+		//constants
+		double n1;
+		double n2;
+		double theta1;
+		double theta2;
+		
+		//terms
+		double p;
+		double s;
+		
+		//solution
+		//double R = (p * p + s * s)/2.0;
+		return 0;
 	}
 }

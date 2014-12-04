@@ -65,9 +65,11 @@ public class Triangle extends Surface {
 	public boolean intersect(IntersectionRecord outRecord, Ray rayIn) {
 	  	//TODO#A7: Modify the intersect method: transform the ray to object space
 	  	//transform the resulting intersection point and normal to world space
-
-		Ray ray = rayIn;		
 		
+		Ray ray = new Ray(rayIn);		
+		untransformRay(ray);
+		
+		////code past this point not mine!
 		Vector3d v0 = owner.getPosition(index.x).clone();
 		
 		double g = ray.direction.x;
@@ -125,6 +127,11 @@ public class Triangle extends Surface {
 						.addMultiple(gamma, owner.getUV(index.z));
 			}
 		}
+		
+		//this code now mine!
+		//transforms intersection back to world space
+		tMat.mulPos(outRecord.location);
+		tMatTInv.mulDir(outRecord.normal).normalize();
 
 		return true;
 

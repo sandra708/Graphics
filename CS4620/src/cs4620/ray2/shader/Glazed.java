@@ -50,6 +50,25 @@ public class Glazed extends Shader {
 	 */
 	@Override
 	public void shade(Colord outIntensity, Scene scene, Ray ray, IntersectionRecord record, int depth) {
+		//useful vectors
+		Vector3d normal = record.normal;
+		Vector3d view = (new Vector3d(ray.direction)).negate();
+		Vector3d reflectDir = ((new Vector3d(normal)).mul(2).mul(normal.dot(view))).sub(view);
+		double r = fresnel(normal, reflectDir, refractiveIndex);
+		
+		//reflection
+		Ray reflection = new Ray(record.location, reflectDir);
+		Colord reflC = new Colord();
+		RayTracer.shadeRay(reflC, scene, reflection, depth + 1);
+		
+		//substrate
+		substrate.shade(outIntensity, scene, ray, record, depth + 1);
+		
+		//combine
+		outIntensity.mul(1 - r);
+		reflC.mul(r);
+		outIntensity.add(reflC);
+		
 		// TODO#A7: fill in this function.
 		
 
