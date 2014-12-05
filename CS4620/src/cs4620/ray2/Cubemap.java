@@ -55,6 +55,87 @@ public class Cubemap {
 
 
 	public void evaluate(Vector3d dir, Colord outRadiance) {
+		Vector3d uv = (new Vector3d(dir)).normalize();
+		
+		Vector3d abs = new Vector3d(uv);
+		abs.abs();
+		
+		int face; //-z, -x, -y, z, x, y map to 0..5
+		
+		if(abs.x > abs.y){
+			if(abs.x > abs.z){
+				if(uv.x > 0){
+					face = 4;
+				}else{
+					face = 1;
+				}
+			}else{
+				if(uv.z > 0){
+					face = 3;
+				}else{
+					face = 0;
+				}
+			}
+		}else{
+			if(abs.y > abs.z){
+				if(uv.y > 0){
+					face = 5;
+				}else{
+					face = 2;
+				}
+			}else{
+				if(uv.z > 0){
+					face = 3;
+				}else{
+					face = 0;
+				}
+			}
+		}
+		//adjust so the non-face numbers come out in texture space
+		uv.mul(Math.sqrt(3));
+		uv.mul(0.5);
+		uv.add(0.5);
+		
+		Vector2d texUV; //image coordinates 
+		
+		switch(face){
+		case 0: //-z
+		case 3: //+z
+			texUV = new Vector2d(uv.x, uv.y);
+		case 1: //-x
+		case 4: //+x
+			texUV = new Vector2d(uv.y, uv.z);
+		case 2: //-y
+		case 5: //+y
+			texUV = new Vector2d(uv.x, uv.z);
+		default:
+			texUV = new Vector2d();
+		}
+		//convert to pixels
+		texUV.mul(blockSz);
+		//convert to whole image
+		switch(face){
+		case 0: //-z
+			texUV.add(blockSz, 2 * blockSz);
+		case 3: //+z
+			texUV.add(blockSz, 0);
+		case 1: //-x
+			texUV.add(0, 2 * blockSz);
+		case 4: //+x
+			texUV.add(2 * blockSz, 2 * blockSz);
+		case 2: //-y
+			texUV.add(blockSz, blockSz);
+		case 5: //+y
+			texUV.add(blockSz, 3 * blockSz);
+		}
+		
+		float R = imageData[(int) Math.round(3 * (texUV.x + width * texUV.y))];
+		float G = imageData[(int) Math.round(3 * (texUV.x + width * texUV.y)) + 1];
+		float B = imageData[(int) Math.round(3 * (texUV.x + width * texUV.y)) + 2];
+		
+		outRadiance.set(R, G, B);
+		outRadiance.mul(scaleFactor);
+		
 		//TODO#A7 Look up for the radiance of the environment mapping in a given direction
 		//don't forget to multiply the outRadiance by scaleFactor
 		

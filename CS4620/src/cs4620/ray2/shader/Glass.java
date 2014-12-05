@@ -62,6 +62,7 @@ public class Glass extends Shader {
 			criticalAngle = Math.asin(refractiveIndex);
 			viewingAngle = normal.angle(view);
 			refractiveAngle = Math.asin(refractiveIndex) * viewingAngle;
+
 		}
 		
 		if(criticalAngle != Double.NaN && viewingAngle > criticalAngle){

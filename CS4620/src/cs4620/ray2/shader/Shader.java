@@ -63,15 +63,36 @@ public abstract class Shader {
 		return scene.getAnyIntersection(shadowRay);
 	}
 	
+	/**
+	 * 
+	 * @param normal
+	 * @param outgoing
+	 * @param refractiveIndex - we assume the normal points out into air
+	 * @return
+	 */
 	protected double fresnel(Vector3d normal, Vector3d outgoing, double refractiveIndex) {
 		//TODO#A7 compute the fresnel term using the equation in the lecture
-		
+
 		//constants
-		double n1 = 1; //assume this is air!
-		double n2 = refractiveIndex;
-		
-		double theta2 = normal.angle(outgoing);
-		double theta1 = Math.asin((n2 / n1) * Math.sin(theta2));
+		double n1;
+		double n2;
+
+		double theta2;
+		double theta1;
+
+		if(normal.dot(outgoing) < 0){
+			n1 = refractiveIndex;
+			n2 = 1.0;
+			
+			theta2 = Math.abs(normal.angle(outgoing));
+			theta1 = Math.sin(n2 * Math.asin(theta2)/n1);
+		}else{
+			n1 = 1.0;
+			n2 = refractiveIndex;
+			
+			theta1 = normal.angle(outgoing);
+			theta2 = Math.sin(n1 * Math.asin(theta1) / n2);
+		}
 		
 		//intermediate values (nX * cos(thetaY))
 		double t11 = n1 * Math.cos(theta1);

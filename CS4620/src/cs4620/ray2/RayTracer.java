@@ -259,7 +259,7 @@ public class RayTracer {
 			offsetY = spiral.curSubY*SUB_HEIGHT;
 			sizeX = Math.min(width-offsetX,SUB_WIDTH);
 			sizeY = Math.min(height-offsetY,SUB_HEIGHT);
-
+				
 			renderBlock(scene, image, offsetX, offsetY, sizeX, sizeY);
 
 			//Update display
@@ -323,6 +323,7 @@ public class RayTracer {
 		// Do some basic setup
 		Ray ray = new Ray();
 		Colord pixelColor = new Colord();
+		Colord rayColor = new Colord();
 
 		// Set the camera aspect ratio to match output image
 		int width = outImage.getWidth();
@@ -344,20 +345,30 @@ public class RayTracer {
 				// TODO#A7 Implement supersampling for antialiasing.
 				// Each pixel should have (samples*samples) subpixels.
 				//Colord[][] rayColors = new Colord[samples][samples];
-				for(int i = 0; i < samples; i++){
-					for(int j = 0; j < samples; j++){
-						cam.getRay(ray, ((i / samples) + x) / (width), ((j / samples) + y) / (height));
-						Colord sampleColor = new Colord();
-						shadeRay(sampleColor, scene, ray, 1);
-						if(sampleColor.len() > 0){
-							pixelColor.add(sampleColor);
-						}
-						//pixelColor.add(sampleColor);
-					}
-				}
+//				for(int i = 0; i < samples; i++){
+//					for(int j = 0; j < samples; j++){
+//						cam.getRay(ray, ((i / samples) + x) / (width), ((j / samples) + y) / (height));
+//						Colord sampleColor = new Colord();
+//						shadeRay(sampleColor, scene, ray, 1);
+//						if(sampleColor.len() > 0){
+//							pixelColor.add(sampleColor);
+//						}
+//						//pixelColor.add(sampleColor);
+//					}
+//				}
+//				
+//				pixelColor.mul(1f/(samples* samples));	
+//				pixelColor.mul(exposure);
 				
-				pixelColor.mul(1f/(samples* samples));	
+				cam.getRay(ray,  (double) x / width, (double) y / height);
+				shadeRay(rayColor, scene, ray, 1);
+				pixelColor.add(rayColor);
+			
+					
 				pixelColor.mul(exposure);
+
+				
+				outImage.setPixelColor(pixelColor, x, y);
 				
 				outImage.setPixelColor(pixelColor, x, y);
 			}

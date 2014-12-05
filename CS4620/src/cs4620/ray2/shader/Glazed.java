@@ -53,8 +53,9 @@ public class Glazed extends Shader {
 		//useful vectors
 		Vector3d normal = record.normal;
 		Vector3d view = (new Vector3d(ray.direction)).negate();
+		view.normalize();
 		Vector3d reflectDir = ((new Vector3d(normal)).mul(2).mul(normal.dot(view))).sub(view);
-		double r = fresnel(normal, reflectDir, refractiveIndex);
+		double r = fresnel(normal, view, refractiveIndex);
 		
 		//reflection
 		Ray reflection = new Ray(record.location, reflectDir);
