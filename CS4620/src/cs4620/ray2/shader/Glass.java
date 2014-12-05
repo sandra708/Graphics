@@ -46,25 +46,50 @@ public class Glass extends Shader {
 		outIntensity.setZero();
 		//useful vectors
 		Vector3d normal = record.normal;
-		Vector3d view = (new Vector3d(ray.direction)).negate();
-		Vector3d reflectDir = ((new Vector3d(normal)).mul(2).mul(normal.dot(view))).sub(view);
-		double r = fresnel(normal, reflectDir, refractiveIndex);
-		double thetaL = normal.angle(reflectDir);
-		double thetaR;
+		Vector3d view = ((new Vector3d(ray.direction)).negate()).normalize();
+		Vector3d reflection = ((new Vector3d(normal)).mul(2).mul(normal.dot(view))).sub(view);
+		reflection.normalize();
+		double viewingAngle;
+		double criticalAngle; 
+		double refractiveAngle;
+		if(normal.dot(view) < 0){
+			//we are coming from inside the glass toward air
+			criticalAngle = Math.asin(1.0 / refractiveIndex);
+			viewingAngle = (new Vector3d(normal).negate()).angle(view);
+			refractiveAngle = Math.asin((1.0 / refractiveIndex) * viewingAngle);
+		}else{
+			//from air into the glass
+			criticalAngle = Math.asin(refractiveIndex);
+			viewingAngle = normal.angle(view);
+			refractiveAngle = Math.asin(refractiveIndex) * viewingAngle;
+		}
+		
+		if(criticalAngle != Double.NaN && viewingAngle > criticalAngle){
+			//total internal reflection
+			RayTracer.shadeRay(outIntensity, scene, new Ray(record.location, reflection), depth + 1);
+			return;
+		}
+		
+		double R = fresnel(normal, view, refractiveIndex);
 		
 		//reflective portion
 		Colord reflC = new Colord();
+		RayTracer.shadeRay(reflC, scene, new Ray(record.location, reflection), depth + 1);
 		
 		//refractive portion
-		Colord refrC = new Colord();
+		Colord refrC = new Colord(); 
+		Vector3d basis = (new Vector3d(normal)).cross(view);
+		//orth is orthogonal to the normal but in the same plane as the viewing ray
+		Vector3d orth = (new Vector3d(basis)).cross(normal);
+		orth.normalize();
+		orth.mul(Math.cos(refractiveAngle));
+		Vector3d refraction = (new Vector3d(normal)).mul(Math.sin(refractiveAngle)).add(orth);
+		RayTracer.shadeRay(refrC, scene, new Ray(record.location, refraction), depth + 1);
 		
 		//combination
-		outIntensity.add(reflC.mul(1 - r)).add(refrC.mul(r));
+		outIntensity.add(reflC.mul(1 - R)).add(refrC.mul(R));
 		
 		// TODO#A7: fill in this function.
-		
-
-
 	}
 	
 
