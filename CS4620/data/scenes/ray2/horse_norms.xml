@@ -17,9 +17,10 @@
     <diffuseColor>.05 1 0.2</diffuseColor>
   </shader>
   <shader name="horse" type="CookTorrance">
-    <diffuseColor>0.8 0.4 0.1</diffuseColor>
-    <specularColor>0.9 0.7 0.3</specularColor>
-	<roughness>0.8</roughness>
+    <diffuseColor>0.9 0.5 0.2</diffuseColor>
+    <specularColor>1.0 0.8 0.4</specularColor>
+	<roughness>0.9</roughness>
+	<refractiveIndex>1.4</refractiveIndex>
   </shader>
 
   <surface type="Group">

@@ -114,6 +114,7 @@ public class PanelDisplay extends JPanel {
 		for (int y = h-yh; y < h-yl; y++) {
 			for (int x = xl; x < xh; x++) {
 				image.getPixelColor(pixelColor,x,h-y-1);
+				pixelColor.gammaCorrect(2.2);
 				int rgb = pixelColor.toColor().toIntRGB();
 				bufferedImage.setRGB(x,y,rgb);
 			}
