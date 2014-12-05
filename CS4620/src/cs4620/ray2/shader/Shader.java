@@ -67,17 +67,24 @@ public abstract class Shader {
 		//TODO#A7 compute the fresnel term using the equation in the lecture
 		
 		//constants
-		double n1;
-		double n2;
-		double theta1;
-		double theta2;
+		double n1 = 1; //assume this is air!
+		double n2 = refractiveIndex;
+		
+		double theta2 = normal.angle(outgoing);
+		double theta1 = Math.asin((n2 / n1) * Math.sin(theta2));
+		
+		//intermediate values (nX * cos(thetaY))
+		double t11 = n1 * Math.cos(theta1);
+		double t12 = n1 * Math.cos(theta2);
+		double t21 = n2 * Math.cos(theta1);
+		double t22 = n2 * Math.cos(theta2);
 		
 		//terms
-		double p;
-		double s;
+		double p = (t21 - t12)/(t21 + t12);
+		double s = (t11 - t22)/(t11 + t22);
 		
 		//solution
-		//double R = (p * p + s * s)/2.0;
-		return 0;
+		double R = (p * p + s * s)/2.0;
+		return R;
 	}
 }

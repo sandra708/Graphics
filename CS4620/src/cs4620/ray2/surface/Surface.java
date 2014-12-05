@@ -87,20 +87,6 @@ public abstract class Surface {
 	 */
 	public abstract void computeBoundingBox();
 	
-	/** Given two opposite corners of the bounding box,
-	 * 	computes the minimum and maximum corners, as well
-	 * 	as the center of the box as the surface average, and stores.
-	 * 
-	 * @param minW some corner of the bounding box
-	 * @param maxW the corner precisely opposite to minW
-	 */
-	protected void setBoundingBox(Vector3d minW, Vector3d maxW){
-		minBound = new Vector3d(Math.min(minW.x, maxW.x), Math.min(minW.y, maxW.y), Math.min(minW.z, maxW.z));
-		maxBound = new Vector3d(Math.max(minW.x, maxW.x), Math.max(minW.y, maxW.y), Math.max(minW.z, maxW.z));
-		averagePosition = new Vector3d((minBound.x + maxBound.x)/2.0, 
-				(minBound.y + maxBound.y)/2.0, (minBound.z + maxBound.z)/2.0);
-	}
-	
 	/**
 	 * Add this surface to the array list in. This array list will be used
 	 * in the AABB tree construction.

@@ -49,7 +49,7 @@ public class Glass extends Shader {
 		Vector3d view = (new Vector3d(ray.direction)).negate();
 		Vector3d reflectDir = ((new Vector3d(normal)).mul(2).mul(normal.dot(view))).sub(view);
 		double r = fresnel(normal, reflectDir, refractiveIndex);
-		double thetaL;
+		double thetaL = normal.angle(reflectDir);
 		double thetaR;
 		
 		//reflective portion
