@@ -99,13 +99,13 @@ public class Sphere extends Surface {
 			double v = (theta - Math.PI / 2) / Math.PI;
 			outRecord.texCoords.set(u, v);
 			
-			}
-
-		//transform back to world space
-		tMat.mulPos(outRecord.location);
-		tMatTInv.mulDir(outRecord.normal);
-		
-		return true;
+			//transform back to world space
+			tMat.mulPos(outRecord.location);
+			tMatTInv.mulDir(outRecord.normal);
+			
+			return true;
+		}
+		return false;
 	}
 
 	public void computeBoundingBox() {

@@ -87,9 +87,11 @@ public class BvhNode {
 		//vt > minPt - p && vt < maxPt - p && t > start && t < end
 		Vector3d tMin = (new Vector3d(minBound)).sub(ray.origin).div(ray.direction);
 		Vector3d tMax = (new Vector3d(maxBound)).sub(ray.origin).div(ray.direction);
-		double tS = Math.max(Math.max(tMin.x, tMin.y), Math.max(tMin.z, ray.start));
-		double tE = Math.min(Math.min(tMax.x, tMax.y), Math.min(tMax.z, ray.end));
-		return tS < tE;
+		double tSMin = Math.max(Math.max(tMin.x, tMin.y), Math.max(tMin.z, ray.start));
+		double tEMin = Math.min(Math.min(tMin.x, tMin.y), Math.min(tMin.z, ray.end));
+		double tSMax = Math.max(Math.max(tMax.x, tMax.y), Math.max(tMax.z, ray.start));
+		double tEMax = Math.min(Math.min(tMax.x, tMax.y), Math.min(tMax.z, ray.end));
+		return tSMin < tEMax || tSMax < tEMin;
 		// TODO#A7: fill in this function.
 		// Check whether the given ray intersects the AABB of this BvhNode
 	}

@@ -59,13 +59,17 @@ public class Bvh implements AccelStruct {
 		boolean ret = false;
 		if(node.isLeaf()){
 			for(int i = node.surfaceIndexStart; i < node.surfaceIndexEnd; i++){
-				Surface s = surfaces[i];
-				ret = ret || s.intersect(outRecord, rayIn);
+				Surface s = surfaces[i]; //check s's bb
+				IntersectionRecord inRecord = new IntersectionRecord();
+				ret = ret || s.intersect(inRecord, rayIn);
+				if((inRecord.t < outRecord.t || outRecord.t <= 0.0) && inRecord.t > 0.0) outRecord.set(inRecord);
 				if(ret && anyIntersection) return true;
 			}
 		}else{
 			for(BvhNode n : node.child){
-				ret  = ret || intersectHelper(n, outRecord, rayIn, anyIntersection);
+				IntersectionRecord inRecord = new IntersectionRecord();
+				ret  = ret || intersectHelper(n, inRecord, rayIn, anyIntersection);
+				if((inRecord.t < outRecord.t || outRecord.t <= 0.0) && inRecord.t > 0.0) outRecord.set(inRecord);
 				if(ret && anyIntersection) return true;
 			}
 		}
@@ -117,9 +121,7 @@ public class Bvh implements AccelStruct {
 		// Check for the base case. 
 		// If the range [start, end) is small enough (e.g. less than or equal to 10), just return a new leaf node.
 		if(end - start <= 10){
-			BvhNode leaf = new BvhNode();
-			leaf.maxBound.set(maxB);
-			leaf.minBound.set(minB);
+			BvhNode leaf = new BvhNode(minB, maxB, null, null, start, end);
 			return leaf;
 		}
 

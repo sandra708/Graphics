@@ -126,15 +126,15 @@ public class Triangle extends Surface {
 						.addMultiple(beta, owner.getUV(index.y))
 						.addMultiple(gamma, owner.getUV(index.z));
 			}
+			
+			//this code now mine!
+			//transforms intersection back to world space
+			tMat.mulPos(outRecord.location);
+			tMatTInv.mulDir(outRecord.normal).normalize();
+			return true;
 		}
-		
-		//this code now mine!
-		//transforms intersection back to world space
-		tMat.mulPos(outRecord.location);
-		tMatTInv.mulDir(outRecord.normal).normalize();
 
-		return true;
-
+		return false;
 	}
 
 	public void computeBoundingBox() {
