@@ -50,18 +50,18 @@ public abstract class Shader {
 	 * false otherwise.
 	 */
 	protected boolean isShadowed(Scene scene, Light light, IntersectionRecord record, Ray shadowRay) {		
-		return false;
-//		// Setup the shadow ray to start at surface and end at light
-//		shadowRay.origin.set(record.location);
-//		shadowRay.direction.set(light.getDirection(record.location));
-//
-//		double end = light.getShadowRayEnd(record.location);//shadowRay.direction.len();
-//		shadowRay.direction.normalize();
-//		
-//		// Set the ray to end at the light
-//		shadowRay.makeOffsetSegment(end);
-//		
-//		return scene.getAnyIntersection(shadowRay);
+		//return false;
+		// Setup the shadow ray to start at surface and end at light
+		shadowRay.origin.set(record.location);
+		shadowRay.direction.set(light.getDirection(record.location));
+
+		double end = light.getShadowRayEnd(record.location);//shadowRay.direction.len();
+		shadowRay.direction.normalize();
+		
+		// Set the ray to end at the light
+		shadowRay.makeOffsetSegment(end);
+		
+		return scene.getAnyIntersection(shadowRay);
 	}
 	
 	/**

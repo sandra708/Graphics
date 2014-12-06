@@ -154,35 +154,49 @@ public class Cylinder extends Surface {
 		Vector3d centerUp = (new Vector3d(center)).add(0, 0, height / 2.0);
 		averagePosition = tMat.mulPos(new Vector3d(centerUp));
 		
-		Vector3d[] box = {
-				new Vector3d(1, 0, 0), new Vector3d(0, 1, 0), new Vector3d(0, 0, 1),
-				new Vector3d(-1, 0, 0), new Vector3d(0, -1, 0), new Vector3d(0, 0, -1)
+		Vector3d[] minimax = new Vector3d[]{
+			((new Vector3d(center)).sub(radius, radius, 0)), (new Vector3d(center)).add(radius, radius, height)
 		};
-		
-		Vector3d[] obj = new Vector3d[6];
+		Vector3d[] box =  new Vector3d[8];
+		minBound = new Vector3d(Double.POSITIVE_INFINITY);
+		maxBound = new Vector3d(Double.NEGATIVE_INFINITY);
 		
 		for(int i = 0; i < box.length; i++){
-			tMatInv.mulDir(box[i]);
-			box[i].normalize();
-			//check if intersects cap or band
-			Vector2d band = new Vector2d(box[i].x, box[i].y);
-			double lenR = band.len();
-			double lenH = new Vector2d(0, box[i].z).len();
-			
-			if(lenR * radius < lenH * height / 2.0){ //intersects a cap
-				double z = height / 2.0;
-				if(box[i].z < 0) z = -z;
-				obj[i] = new Vector3d(band.x, band.y, z);
-			}else{ //intersects the band
-				band.normalize().mul(radius);
-				obj[i] = new Vector3d(band.x, band.y, box[i].z * height / 2.0);
-			}
-			obj[i].add(centerUp);
-			tMat.mulPos(centerUp);
+			box[i] = new Vector3d(minimax[i % 2].x, minimax[i / 4].y, minimax[i / 2 % 2].y);
+			tMat.mulPos(box[i]);
+			minBound.set(Math.min(minBound.x, box[i].x), Math.min(minBound.y, box[i].y), Math.min(minBound.z, box[i].z));
+			maxBound.set(Math.max(maxBound.x, box[i].x), Math.max(maxBound.y, box[i].y), Math.max(maxBound.z, box[i].z));
 		}
 		
-		maxBound = new Vector3d(obj[0].x, obj[1].y, obj[2].z);
-		minBound = new Vector3d(obj[3].x, obj[4].y, obj[5].z);
+//		Vector3d[] box = {
+//				new Vector3d(1, 0, 0), new Vector3d(0, 1, 0), new Vector3d(0, 0, 1),
+//				new Vector3d(-1, 0, 0), new Vector3d(0, -1, 0), new Vector3d(0, 0, -1)
+//		};
+//		
+//		Vector3d[] obj = new Vector3d[6];
+//		
+//		for(int i = 0; i < box.length; i++){
+//			tMatInv.mulDir(box[i]);
+//			box[i].normalize();
+//			//check if intersects cap or band
+//			Vector2d band = new Vector2d(box[i].x, box[i].y);
+//			double lenR = band.len();
+//			double lenH = new Vector2d(0, box[i].z).len();
+//			
+//			if(lenR * radius < lenH * height / 2.0){ //intersects a cap
+//				double z = height / 2.0;
+//				if(box[i].z < 0) z = -z;
+//				obj[i] = new Vector3d(band.x, band.y, z);
+//			}else{ //intersects the band
+//				band.normalize().mul(radius);
+//				obj[i] = new Vector3d(band.x, band.y, box[i].z * height / 2.0);
+//			}
+//			obj[i].add(centerUp);
+//			tMat.mulPos(centerUp);
+//		}
+//		
+//		maxBound = new Vector3d(obj[0].x, obj[1].y, obj[2].z);
+//		minBound = new Vector3d(obj[3].x, obj[4].y, obj[5].z);
 		// TODO#A7: Compute the bounding box and store the result in
 		// averagePosition, minBound, and maxBound.
 		// Hint: The bounding box may be transformed by a transformation matrix.
