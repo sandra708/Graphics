@@ -346,29 +346,28 @@ public class RayTracer {
 				// TODO#A7 Implement supersampling for antialiasing.
 				// Each pixel should have (samples*samples) subpixels.
 				//Colord[][] rayColors = new Colord[samples][samples];
-//				for(int i = 0; i < samples; i++){
-//					for(int j = 0; j < samples; j++){
-//						cam.getRay(ray, ((i / samples) + x) / (width), ((j / samples) + y) / (height));
-//						Colord sampleColor = new Colord();
-//						shadeRay(sampleColor, scene, ray, 1);
+				for(double i = - 1.0/2.0; i < 1.0/2.0; i+= sInv){
+					for(double j = - samples / 2.0; j < samples / 2.0; j++){
+						double u = (i+ x) / width;
+						double v = (j + y) / height;
+						cam.getRay(ray, u, v);
+						Colord sampleColor = new Colord();
+						shadeRay(sampleColor, scene, ray, 1);
 //						if(sampleColor.len() > 0){
 //							pixelColor.add(sampleColor);
 //						}
-//						//pixelColor.add(sampleColor);
-//					}
-//				}
-//				
-//				pixelColor.mul(1f/(samples* samples));	
-//				pixelColor.mul(exposure);
+						pixelColor.add(sampleColor);
+					}
+				}
 				
-				cam.getRay(ray,  (double) x / width, (double) y / height);
-				//cam.getRay(ray, 0.5, 0.5);
-				//cam.getRay(ray, 0.6, 0.45);
-				shadeRay(rayColor, scene, ray, 1);
-				pixelColor.add(rayColor);
-			
-					
+				pixelColor.div(samples* samples);	
 				pixelColor.mul(exposure);
+				
+//				cam.getRay(ray,  (double) x / width, (double) y / height);
+//				//cam.getRay(ray, 0.5, 0.5);
+//				//cam.getRay(ray, 0.6, 0.45);
+//				shadeRay(rayColor, scene, ray, 1);
+//				pixelColor.add(rayColor);
 
 				
 //				outImage.setPixelColor(pixelColor, x, y);
