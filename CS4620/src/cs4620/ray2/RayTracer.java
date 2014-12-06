@@ -290,7 +290,7 @@ public class RayTracer {
 
 		if(depth > MAX_DEPTH)
 			return;
-		if(depth > 5) return; //to speed testing
+		//if(depth > 5) return; //to speed testing
 
 		IntersectionRecord intersectionRecord = new IntersectionRecord();
 
@@ -363,6 +363,7 @@ public class RayTracer {
 				
 				cam.getRay(ray,  (double) x / width, (double) y / height);
 				//cam.getRay(ray, 0.5, 0.5);
+				//cam.getRay(ray, 0.6, 0.45);
 				shadeRay(rayColor, scene, ray, 1);
 				pixelColor.add(rayColor);
 			

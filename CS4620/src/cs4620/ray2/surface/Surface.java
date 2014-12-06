@@ -7,8 +7,12 @@ import cs4620.ray2.IntersectionRecord;
 import cs4620.ray2.Ray;
 import cs4620.ray2.shader.Shader;
 import egl.math.Colord;
+import egl.math.Matrix3;
+import egl.math.Matrix3d;
 import egl.math.Matrix4d;
+import egl.math.Quat;
 import egl.math.Vector3d;
+import egl.math.Vector4;
 
 /**
  * Abstract base class for all surfaces.  Provides access for shader and
@@ -62,10 +66,28 @@ public abstract class Surface {
 		return ray;
 	}
 	
+	protected void debugTransformation(){
+		System.out.println(toString());
+		  System.out.println("Translation: " + tMat.getTrans());
+		  Matrix3d axes = new Matrix3d(tMat.getAxes());
+		  float[] b = new float[9];
+		  for(int i = 0; i < axes.m.length; i++){
+			  b[i] = (float) axes.m[i];
+		  }
+		  Matrix3 convert = new Matrix3(b);
+		  Matrix3 scale = new Matrix3();
+		  Matrix3 rotation = new Matrix3();
+		  convert.polar_decomp(rotation, scale);
+		  System.out.println("Rotation (axis-angle): " + (new Quat(rotation)).toAxisAngle(new Vector4()));
+		  System.out.println("Scale: " + scale);
+		  System.out.println();
+	}
+	
 	public void setTransformation(Matrix4d a, Matrix4d aInv, Matrix4d aTInv) {
 		tMat = a;
 		tMatInv = aInv;
 		tMatTInv = aTInv;
+		
 		computeBoundingBox();
 	}
 	

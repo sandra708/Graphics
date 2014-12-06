@@ -47,8 +47,7 @@ public class Sphere extends Surface {
 	  	//transform the resulting intersection point and normal to world space
 
 		//transform the ray into object space
-		Ray ray = new Ray(rayIn);
-		untransformRay(ray);
+		Ray ray = untransformRay(rayIn);
 		
 		// Rename the common vectors so I don't have to type so much
 		Vector3d d = ray.direction;
@@ -109,7 +108,7 @@ public class Sphere extends Surface {
 	}
 
 	public void computeBoundingBox() {
-		averagePosition = tMat.mulPos(center);
+		averagePosition = tMat.mulPos(new Vector3d(center));
 		
 		Vector3d[] minimax = new Vector3d[]{
 			(new Vector3d(center)).sub(radius), (new Vector3d(center)).add(radius)
@@ -138,7 +137,7 @@ public class Sphere extends Surface {
 		
 //		minBound = new Vector3d(Double.MAX_VALUE);
 //		maxBound = new Vector3d(Double.MIN_VALUE);
-//		
+////		
 //		for(int i = 0; i < box.length; i++){
 //			minBound.set(Math.min(minBound.x, box[i].x), Math.min(minBound.y, box[i].y), 
 //					Math.min(minBound.z, box[i].z));

@@ -100,7 +100,7 @@ public class BvhNode {
 		double tEnd = Math.min(Math.min(tExit.x, tExit.y), Math.min(tExit.z, rEnd));
 		
 		return tStart < tEnd;
-		
+		//return true;
 //		//localize ray coordinates
 //		Vector3d min = (new Vector3d(minBound)).sub(ray.origin);
 //		Vector3d max = (new Vector3d(maxBound)).sub(ray.origin);
@@ -133,8 +133,8 @@ public class BvhNode {
 		// Check whether the given ray intersects the AABB of this BvhNode
 	}
 	
-	//checks that the first element of box is within the square delimited by the other two
-	private boolean intersectSq(double ptx, double pty, double minx, double miny, double maxx, double maxy){
-		return (ptx > minx && ptx < maxx && pty > miny && pty < maxy);
-	}
+//	//checks that the first element of box is within the square delimited by the other two
+//	private boolean intersectSq(double ptx, double pty, double minx, double miny, double maxx, double maxy){
+//		return (ptx > minx && ptx < maxx && pty > miny && pty < maxy);
+//	}
 }

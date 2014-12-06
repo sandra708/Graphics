@@ -47,8 +47,7 @@ public class Cylinder extends Surface {
 		//TODO#A7: Modify the intersect method: 
 		//1. transform the ray to object space (use untransformRay)
 		//2. transform the resulting intersection point and normal to world space		  
-		Ray ray = new Ray(rayIn);
-		untransformRay(ray);
+		Ray ray = untransformRay(rayIn);
 
 		// Rename the common vectors so I don't have to type so much
 		Vector3d d = ray.direction;

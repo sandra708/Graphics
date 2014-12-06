@@ -65,12 +65,18 @@ public class Triangle extends Surface {
 	public boolean intersect(IntersectionRecord outRecord, Ray rayIn) {
 	  	//TODO#A7: Modify the intersect method: transform the ray to object space
 	  	//transform the resulting intersection point and normal to world space
-		
-		Ray ray = new Ray(rayIn);		
-		untransformRay(ray);
+				
+		Ray ray = untransformRay(rayIn);
 		
 		////code past this point not mine!
 		Vector3d v0 = owner.getPosition(index.x).clone();
+		
+		//and to test
+		
+		if(index.equals(new Vector3i(2, 5, 6))){
+			Vector3d v1 = owner.getPosition(index.y).clone();
+			Vector3d v2 = owner.getPosition(index.z).clone();
+		}
 		
 		double g = ray.direction.x;
 		double h = ray.direction.y;
@@ -162,6 +168,9 @@ public class Triangle extends Surface {
 		averagePosition = tri[0].add(tri[1]).add(tri[2]).mul(1.0/3.0);
 		// TODO#A7: Compute the bounding box and store the result in
 		// averagePosition, minBound, and maxBound.
+		
+//		minBound.set(Double.NEGATIVE_INFINITY);
+//		maxBound.set(Double.POSITIVE_INFINITY);
 	}
 
 	/**

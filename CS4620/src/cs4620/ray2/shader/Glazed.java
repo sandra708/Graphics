@@ -6,6 +6,7 @@ import cs4620.ray2.IntersectionRecord;
 import cs4620.ray2.Ray;
 import cs4620.ray2.Scene;
 import egl.math.Colord;
+import egl.math.Vector2d;
 import egl.math.Vector3d;
 
 /**
@@ -54,11 +55,23 @@ public class Glazed extends Shader {
 		Vector3d normal = new Vector3d(record.normal);
 		Vector3d view = (new Vector3d(ray.direction)).negate();
 		view.normalize();
+		Vector3d o = (new Vector3d(normal)).cross(view);
+		Vector3d b = (new Vector3d(o)).cross(normal);
+		
+		//useful vectors
 		Vector3d reflectDir = ((new Vector3d(normal)).mul(2).mul(normal.dot(view))).sub(view);
 		double r = fresnel(normal, view, refractiveIndex);
 		
-		//reflection
-		Ray reflection = new Ray(record.location, reflectDir);
+		//for debugging
+		Vector2d V = new Vector2d(view.dot(b), view.dot(normal));
+		Vector2d R = new Vector2d(reflectDir.dot(b), reflectDir.dot(normal));
+		double viewingAngle = view.angle(normal);
+		double reflectiveAngle = reflectDir.angle(normal);
+		
+		//reflection - make v's new
+		Ray reflection = new Ray(new Vector3d(record.location), new Vector3d(reflectDir));
+		reflection.makeOffsetRay();
+		//reflection.end = Double.POSITIVE_INFINITY;
 		Colord reflC = new Colord();
 		RayTracer.shadeRay(reflC, scene, reflection, depth + 1);
 		

@@ -5,8 +5,12 @@ import java.util.Iterator;
 
 import cs4620.ray2.IntersectionRecord;
 import cs4620.ray2.Ray;
+import egl.math.Matrix3;
+import egl.math.Matrix3d;
 import egl.math.Matrix4d;
+import egl.math.Quat;
 import egl.math.Vector3d;
+import egl.math.Vector4;
 
 public class Group extends Surface {
 
@@ -34,16 +38,17 @@ public class Group extends Surface {
     // TODO#A7: Compute tMat, tMatInv, tMatTInv using transformMat.
     // Hint: We apply the transformation from bottom up the tree. 
     // i.e. The child's transformation will be applied to objects before its parent's.
-	  tMat = pMat.clone().mulBefore(transformMat);
-	  tMatInv = tMat.clone().invert();
-	  tMatTInv = tMat.clone().transpose().invert();
-    
+	  
+	  tMat = (new Matrix4d(pMat)).mulBefore(transformMat);
+	  tMatInv = (new Matrix4d(pMatInv)).mulAfter((new Matrix4d(transformMat)).invert());
+	  tMatTInv = (new Matrix4d(pMatTInv)).mulBefore((new Matrix4d(transformMat)).transpose().invert());
+	  
     // TODO#A7: Call setTransformation(tMat, tMatInv, tMatTInv) on each of the children.
 	  for(Surface s : objs){
-		  s.setTransformation(tMat, tMatInv, tMatTInv);
+		  s.setTransformation(new Matrix4d(tMat), new Matrix4d(tMatInv), new Matrix4d(tMatTInv));
 	  }
 	  
-	computeBoundingBox();
+	  computeBoundingBox();
   }
   
   

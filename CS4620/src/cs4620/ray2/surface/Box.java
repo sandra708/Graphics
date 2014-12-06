@@ -97,8 +97,8 @@ public class Box extends Surface {
 					Math.max(maxBound.z, pts[i].z));
 		}
 		
-		minBound.set(Double.MIN_VALUE);
-		maxBound.set(Double.MAX_VALUE);
+//		minBound.set(Double.MIN_VALUE);
+//		maxBound.set(Double.MAX_VALUE);
 		
 		// TODO#A7: Compute the bounding box and store the result in
 		// averagePosition, minBound, and maxBound.
@@ -118,11 +118,15 @@ public class Box extends Surface {
 		mesh.appendRenderableSurfaces(in);
 	}
 
+	private String debugPrint(){
+		return minPt + " " + maxPt;
+	}
+	
 	/**
 	 * @see Object#toString()
 	 */
 	public String toString() {
-		return "Box ";
+		return "Box " + debugPrint();
 	}
 
 }
