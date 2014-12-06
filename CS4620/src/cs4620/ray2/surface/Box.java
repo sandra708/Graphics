@@ -72,14 +72,14 @@ public class Box extends Surface {
 
 	public void computeBoundingBox() {
 		if(minPt == null || maxPt == null) return;
-		Vector3d[] pts = new Vector3d[7]; //six corners and the center of the box
+		Vector3d[] pts = new Vector3d[8]; //six corners and the center of the box
 		Vector3d[] minimax = new Vector3d[2]; //stores minPt and maxPt
 		minimax[0] = minPt; minimax[1] = maxPt;
 		
 		//generate the seven points: six corners on the box and one center
-		pts[0] = ((new Vector3d(minPt)).add(maxPt)).mul(0.5);
-		for(int i = 1; i < pts.length; i++){
-			pts[i] = new Vector3d(minimax[i % 2].x, minimax[i / 4].y, minimax[(i / 4) % 2].z);
+		averagePosition = ((new Vector3d(minPt)).add(maxPt)).mul(0.5);
+		for(int i = 0; i < pts.length; i++){
+			pts[i] = new Vector3d(minimax[i % 2].x, minimax[i / 4].y, minimax[(i / 2) % 2].z);
 		}
 		
 		//transform to world space
@@ -87,19 +87,18 @@ public class Box extends Surface {
 			tMat.mulPos(pts[i]);
 		}
 		
-		averagePosition = pts[0];
-		
 		minBound = new Vector3d(Integer.MAX_VALUE);
 		maxBound = new Vector3d(Integer.MIN_VALUE);
 		
 		for(int i = 1; i < pts.length; i++){
-			if(pts[i].x < minBound.x) minBound.set(0, pts[i].x);
-			if(pts[i].x > maxBound.x) maxBound.set(0, pts[i].x);
-			if(pts[i].y < minBound.y) minBound.set(1, pts[i].y);
-			if(pts[i].y > maxBound.y) maxBound.set(1, pts[i].y);
-			if(pts[i].z < minBound.z) minBound.set(2, pts[i].z);
-			if(pts[i].z > maxBound.z) maxBound.set(2, pts[i].z);
+			minBound.set(Math.min(minBound.x, pts[i].x), Math.min(minBound.y, pts[i].y), 
+					Math.min(minBound.z, pts[i].z));
+			maxBound.set(Math.max(maxBound.x, pts[i].x), Math.max(maxBound.y, pts[i].y), 
+					Math.max(maxBound.z, pts[i].z));
 		}
+		
+		minBound.set(Double.MIN_VALUE);
+		maxBound.set(Double.MAX_VALUE);
 		
 		// TODO#A7: Compute the bounding box and store the result in
 		// averagePosition, minBound, and maxBound.

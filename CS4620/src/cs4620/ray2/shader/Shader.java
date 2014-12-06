@@ -50,17 +50,18 @@ public abstract class Shader {
 	 * false otherwise.
 	 */
 	protected boolean isShadowed(Scene scene, Light light, IntersectionRecord record, Ray shadowRay) {		
-		// Setup the shadow ray to start at surface and end at light
-		shadowRay.origin.set(record.location);
-		shadowRay.direction.set(light.getDirection(record.location));
-
-		double end = light.getShadowRayEnd(record.location);//shadowRay.direction.len();
-		shadowRay.direction.normalize();
-		
-		// Set the ray to end at the light
-		shadowRay.makeOffsetSegment(end);
-		
-		return scene.getAnyIntersection(shadowRay);
+		return false;
+//		// Setup the shadow ray to start at surface and end at light
+//		shadowRay.origin.set(record.location);
+//		shadowRay.direction.set(light.getDirection(record.location));
+//
+//		double end = light.getShadowRayEnd(record.location);//shadowRay.direction.len();
+//		shadowRay.direction.normalize();
+//		
+//		// Set the ray to end at the light
+//		shadowRay.makeOffsetSegment(end);
+//		
+//		return scene.getAnyIntersection(shadowRay);
 	}
 	
 	/**
@@ -84,14 +85,14 @@ public abstract class Shader {
 			n1 = refractiveIndex;
 			n2 = 1.0;
 			
-			theta2 = Math.abs(normal.angle(outgoing));
-			theta1 = Math.sin(n2 * Math.asin(theta2)/n1);
+			theta2 = Math.PI - (normal.angle(outgoing));
+			theta1 = Math.asin(n2 * Math.sin(theta2)/n1);
 		}else{
 			n1 = 1.0;
 			n2 = refractiveIndex;
 			
 			theta1 = normal.angle(outgoing);
-			theta2 = Math.sin(n1 * Math.asin(theta1) / n2);
+			theta2 = Math.asin(n1 * Math.sin(theta1) / n2);
 		}
 		
 		//intermediate values (nX * cos(thetaY))

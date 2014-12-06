@@ -50,8 +50,8 @@ public class Glazed extends Shader {
 	 */
 	@Override
 	public void shade(Colord outIntensity, Scene scene, Ray ray, IntersectionRecord record, int depth) {
-		//useful vectors
-		Vector3d normal = record.normal;
+		//establish basis
+		Vector3d normal = new Vector3d(record.normal);
 		Vector3d view = (new Vector3d(ray.direction)).negate();
 		view.normalize();
 		Vector3d reflectDir = ((new Vector3d(normal)).mul(2).mul(normal.dot(view))).sub(view);

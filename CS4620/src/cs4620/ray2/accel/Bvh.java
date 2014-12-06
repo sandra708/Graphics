@@ -59,17 +59,28 @@ public class Bvh implements AccelStruct {
 		boolean ret = false;
 		if(node.isLeaf()){
 			for(int i = node.surfaceIndexStart; i < node.surfaceIndexEnd; i++){
-				Surface s = surfaces[i]; //check s's bb
+				Surface s = surfaces[i]; 
 				IntersectionRecord inRecord = new IntersectionRecord();
-				ret = ret || s.intersect(inRecord, rayIn);
-				if((inRecord.t < outRecord.t || outRecord.t <= 0.0) && inRecord.t > 0.0) outRecord.set(inRecord);
+				inRecord.t = Double.POSITIVE_INFINITY;
+				boolean intersect = s.intersect(inRecord, rayIn);
+				ret = ret || intersect;
+				if(intersect && outRecord.surface == null)
+					outRecord.set(inRecord);
+				else if(inRecord.t < outRecord.t){
+					outRecord.set(inRecord);
+				}
 				if(ret && anyIntersection) return true;
 			}
 		}else{
 			for(BvhNode n : node.child){
 				IntersectionRecord inRecord = new IntersectionRecord();
-				ret  = ret || intersectHelper(n, inRecord, rayIn, anyIntersection);
-				if((inRecord.t < outRecord.t || outRecord.t <= 0.0) && inRecord.t > 0.0) outRecord.set(inRecord);
+				inRecord.t = Double.POSITIVE_INFINITY;
+				boolean intersect = intersectHelper(n, inRecord, rayIn, anyIntersection);
+				ret = ret || intersect;
+				if(outRecord.surface == null && intersect){
+					outRecord.set(inRecord);
+				}else if(inRecord.t < outRecord.t)
+					outRecord.set(inRecord);
 				if(ret && anyIntersection) return true;
 			}
 		}
@@ -148,7 +159,7 @@ public class Bvh implements AccelStruct {
 		// ==== Step 5 ====
 		// Recursively create left and right children.
 		BvhNode left = createTree(start, (start + end) / 2);
-		BvhNode right = createTree((start + end) / 2 + 1, end);
+		BvhNode right = createTree((start + end) / 2, end);
 		
 		return new BvhNode(minB, maxB, left, right, start, end);
 	}

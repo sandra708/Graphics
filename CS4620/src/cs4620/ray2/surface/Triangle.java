@@ -138,34 +138,34 @@ public class Triangle extends Surface {
 	}
 
 	public void computeBoundingBox() {
-		Vector3d v0 = new Vector3d(owner.getPosition(index.x));
-		Vector3d v1 = new Vector3d(owner.getPosition(index.y));
-		Vector3d v2 = new Vector3d(owner.getPosition(index.z));
+		Vector3d[] tri = new Vector3d[]{
+			new Vector3d(owner.getPosition(index.x)),
+			new Vector3d(owner.getPosition(index.y)),
+			new Vector3d(owner.getPosition(index.z))
+		};
 		
-		tMat.mulPos(v0);
-		tMat.mulPos(v1);
-		tMat.mulPos(v2);
-		
-		double[] maxs = new double[3];
-		double[] mins = new double[3];
-		double[] avgs = new double[3];
-		
-		for(int i = 0; i < 3; i++){
-			mins[i] = Math.min(v0.get(i), Math.min(v1.get(i), v2.get(i)));
-			maxs[i] = Math.max(v0.get(i), Math.max(v1.get(i), v2.get(i)));
-			avgs[i] = (v0.get(i) + v1.get(i) + v2.get(i)) / 3;
+		for(int i = 0; i < tri.length; i++){
+			tMat.mulPos(tri[i]);
 		}
 		
-		minBound = new Vector3d(mins[0], mins[1], mins[2]);
-		maxBound = new Vector3d(maxs[0], maxs[1], maxs[2]);
+		minBound = new Vector3d(Double.MAX_VALUE);
+		maxBound = new Vector3d(Double.MIN_VALUE);
+		//averagePosition = new Vector3d();
 		
-		averagePosition = new Vector3d(avgs[0], avgs[1], avgs[2]);
+		for(int i = 0; i < tri.length; i++){
+			minBound.set(Math.min(minBound.x, tri[i].x), 
+					Math.min(minBound.y, tri[i].y), Math.min(tri[i].z, minBound.z));
+			maxBound.set(Math.max(maxBound.x, tri[i].x), Math.max(maxBound.y, tri[i].y),
+					Math.max(maxBound.z, tri[i].z));
+		}
+		
+		averagePosition = tri[0].add(tri[1]).add(tri[2]).mul(1.0/3.0);
 		// TODO#A7: Compute the bounding box and store the result in
 		// averagePosition, minBound, and maxBound.
 	}
 
 	/**
-	 * @see Object#toString()
+	 * @see Object#toString()?"
 	 */
 	public String toString() {
 		return "Triangle ";

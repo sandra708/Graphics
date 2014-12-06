@@ -1,6 +1,7 @@
 package cs4620.ray2.accel;
 
 import cs4620.ray2.Ray;
+import egl.math.Vector2d;
 import egl.math.Vector3d;
 
 /**
@@ -83,16 +84,57 @@ public class BvhNode {
 	 * @return true if ray intersects the bounding box
 	 */
 	public boolean intersects(Ray ray) {
-		//minPoint < p + vt < maxpoint
-		//vt > minPt - p && vt < maxPt - p && t > start && t < end
 		Vector3d tMin = (new Vector3d(minBound)).sub(ray.origin).div(ray.direction);
 		Vector3d tMax = (new Vector3d(maxBound)).sub(ray.origin).div(ray.direction);
-		double tSMin = Math.max(Math.max(tMin.x, tMin.y), Math.max(tMin.z, ray.start));
-		double tEMin = Math.min(Math.min(tMin.x, tMin.y), Math.min(tMin.z, ray.end));
-		double tSMax = Math.max(Math.max(tMax.x, tMax.y), Math.max(tMax.z, ray.start));
-		double tEMax = Math.min(Math.min(tMax.x, tMax.y), Math.min(tMax.z, ray.end));
-		return tSMin < tEMax || tSMax < tEMin;
-		// TODO#A7: fill in this function.
+		
+		Vector3d tEnter = new Vector3d(Math.min(tMin.x, tMax.x), 
+				Math.min(tMin.y, tMax.y), Math.min(tMin.z, tMax.z));
+		Vector3d tExit = new Vector3d(Math.max(tMin.x, tMax.x), 
+				Math.max(tMin.y, tMax.y), Math.max(tMin.z, tMax.z));
+		
+		double rStart = ray.start;
+		double rEnd = ray.end;
+		if(rEnd == 0.0) rEnd = Double.POSITIVE_INFINITY;
+		
+		double tStart = Math.max(Math.max(tEnter.x, tEnter.y), Math.max(tEnter.z, rStart));
+		double tEnd = Math.min(Math.min(tExit.x, tExit.y), Math.min(tExit.z, rEnd));
+		
+		return tStart < tEnd;
+		
+//		//localize ray coordinates
+//		Vector3d min = (new Vector3d(minBound)).sub(ray.origin);
+//		Vector3d max = (new Vector3d(maxBound)).sub(ray.origin);
+//		Vector3d dir = new Vector3d(ray.direction);
+//		double[] iFace = {
+//				min.x, max.x, min.y, max.y, min.z, max.z
+//		};
+//		
+//		//first we check if the ray intersects some plane of the cube
+//		for(int i = 0; i < 6; i++){
+//			if(iFace[i] * dir.get(i / 2) < ray.start) continue; //the face is behind the ray
+//			if(iFace[i] * dir.get(i / 2) > ray.end && ray.end > 0.0) continue; //the face is past the end of the ray
+//
+//			//check intersection point is within the face
+//			int j;
+//			int k;
+//			switch(i / 2){
+//			case 0: j = 1; k = 2; break;
+//			case 1: j = 0; k = 2; break;
+//			default: j = 0; k = 1; break;
+//			}
+//			if(intersectSq(Math.abs(iFace[i]) * dir.get(j), Math.abs(iFace[i]) * dir.get(k), iFace[j * 2], 
+//					iFace[k * 2], iFace[j * 2 + 1], iFace[k * 2 + 1])){
+//				return true;
+//			}
+//		}
+//		
+//		return false;
+//		// TODO#A7: fill in this function.
 		// Check whether the given ray intersects the AABB of this BvhNode
+	}
+	
+	//checks that the first element of box is within the square delimited by the other two
+	private boolean intersectSq(double ptx, double pty, double minx, double miny, double maxx, double maxy){
+		return (ptx > minx && ptx < maxx && pty > miny && pty < maxy);
 	}
 }

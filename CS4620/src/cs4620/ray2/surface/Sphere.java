@@ -111,23 +111,61 @@ public class Sphere extends Surface {
 	public void computeBoundingBox() {
 		averagePosition = tMat.mulPos(center);
 		
-		//the axis-directions translated into object-space
-		Vector3d[] box = {
-				new Vector3d(1, 0, 0), new Vector3d(0, 1, 0), new Vector3d(0, 0, 1),
-				new Vector3d(-1, 0, 0), new Vector3d(0, -1, 0), new Vector3d(0, 0, -1)
+		Vector3d[] minimax = new Vector3d[]{
+			(new Vector3d(center)).sub(radius), (new Vector3d(center)).add(radius)
 		};
 		
+		Vector3d[] box = new Vector3d[8];
 		for(int i = 0; i < box.length; i++){
-			tMatInv.mulDir(box[i]);
-			box[i].normalize();
-			box[i].mul(radius);
-			box[i].add(center);
+			box[i] = new Vector3d(minimax[i % 2].x, minimax[i / 4].y, minimax[(i / 2) % 2].z);
 			tMat.mulPos(box[i]);
 		}
 		
-		maxBound = new Vector3d(box[0].x, box[1].y, box[2].z);
-		minBound = new Vector3d(box[3].x, box[4].y, box[5].z);
+		double[] maxes = {
+				Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE
+		};
 		
+		double[] mins = {
+				Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE
+		};
+		
+		for(int i = 0; i < box.length; i++){
+			for(int j = 0; j < maxes.length; j++){
+				maxes[j] = Math.max(maxes[j], box[i].get(j));
+				mins[j] = Math.min(mins[j], box[i].get(j));
+			}
+		}
+		
+//		minBound = new Vector3d(Double.MAX_VALUE);
+//		maxBound = new Vector3d(Double.MIN_VALUE);
+//		
+//		for(int i = 0; i < box.length; i++){
+//			minBound.set(Math.min(minBound.x, box[i].x), Math.min(minBound.y, box[i].y), 
+//					Math.min(minBound.z, box[i].z));
+//			maxBound.set(Math.max(maxBound.x, box[i].x), Math.max(maxBound.y, box[i].y), 
+//					Math.max(maxBound.z, box[i].z));
+//		}
+		
+		minBound = new Vector3d(mins[0], mins[1], mins[2]);
+		maxBound = new Vector3d(maxes[0], maxes[1], maxes[2]);
+		
+//		//the axis-directions translated into object-space
+//		Vector3d[] box = {
+//				new Vector3d(1, 0, 0), new Vector3d(0, 1, 0), new Vector3d(0, 0, 1),
+//				new Vector3d(-1, 0, 0), new Vector3d(0, -1, 0), new Vector3d(0, 0, -1)
+//		};
+//		
+//		for(int i = 0; i < box.length; i++){
+//			tMatInv.mulDir(box[i]);
+//			box[i].normalize();
+//			box[i].mul(radius);
+//			tMat.mulDir(box[i]);
+//			box[i].add(averagePosition);
+//		}
+//		
+//		maxBound = new Vector3d(box[0].x, box[1].y, box[2].z);
+//		minBound = new Vector3d(box[3].x, box[4].y, box[5].z);
+//		
 		// TODO#A7: Compute the bounding box and store the result in
 		// averagePosition, minBound, and maxBound.
 	}
