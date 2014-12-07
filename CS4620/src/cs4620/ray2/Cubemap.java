@@ -60,54 +60,69 @@ public class Cubemap {
 		Vector3d abs = new Vector3d(uv);
 		abs.abs();
 		
+		//the face is determined by which component has the 
+		//greatest absolute value, and the sign of that component
 		int face; //-z, -x, -y, z, x, y map to 0..5
+		double angle; //angle that the incoming vector makes with the center of that face
 		
 		if(abs.x > abs.y){
 			if(abs.x > abs.z){
 				if(uv.x > 0){
 					face = 4;
+					angle = uv.angle(new Vector3d(1, 0, 0));
 				}else{
 					face = 1;
+					angle = uv.angle(new Vector3d(-1, 0, 0));
 				}
 			}else{
 				if(uv.z > 0){
 					face = 3;
+					angle = uv.angle(new Vector3d(0, 0, 1));
 				}else{
 					face = 0;
+					angle = uv.angle(new Vector3d(0, 0, -1));
 				}
 			}
 		}else{
 			if(abs.y > abs.z){
 				if(uv.y > 0){
 					face = 5;
+					angle = uv.angle(new Vector3d(0, 1, 0));
 				}else{
 					face = 2;
+					angle = uv.angle(new Vector3d(0, -1, 0));
 				}
 			}else{
 				if(uv.z > 0){
 					face = 3;
+					angle = uv.angle(new Vector3d(0, 0, -1));
 				}else{
 					face = 0;
+					angle = uv.angle(new Vector3d(0, 0, 1));
 				}
 			}
 		}
 		//adjust so the non-face numbers come out in texture space
+		//uv.mul(Math.sin(angle));
 		uv.mul(Math.sqrt(3));
 		uv.mul(0.5);
 		uv.add(0.5);
+		Colord uvC = (new Colord(uv));
+		uvC.clamp(0.0, 1.0);
+		uv = new Vector3d(uvC);
 		
 		Vector2d texUV; //image coordinates 
 		
 		switch(face){
 		case 0: //-z
 		case 3: //+z
-			texUV = new Vector2d(uv.x, uv.y);
+			texUV = new Vector2d(uv.x, uv.y); break;
 		case 1: //-x
 		case 4: //+x
-			texUV = new Vector2d(uv.y, uv.z);
+			texUV = new Vector2d(uv.y, uv.z); break;
 		case 2: //-y
 		case 5: //+y
-			texUV = new Vector2d(uv.x, uv.z);
+			texUV = new Vector2d(uv.x, uv.z); break;
 		default:
 			texUV = new Vector2d();
 		}
@@ -116,22 +131,26 @@ public class Cubemap {
 		//convert to whole image
 		switch(face){
 		case 0: //-z
-			texUV.add(blockSz, 2 * blockSz);
+			texUV.add(blockSz, 2 * blockSz); break;
 		case 3: //+z
-			texUV.add(blockSz, 0);
+			texUV.add(blockSz, 0); break;
 		case 1: //-x
-			texUV.add(0, 2 * blockSz);
+			texUV.add(0, 2 * blockSz); break;
 		case 4: //+x
-			texUV.add(2 * blockSz, 2 * blockSz);
+			texUV.add(2 * blockSz, 2 * blockSz); break;
 		case 2: //-y
-			texUV.add(blockSz, blockSz);
+			texUV.add(blockSz, blockSz); break;
 		case 5: //+y
-			texUV.add(blockSz, 3 * blockSz);
+			texUV.add(blockSz, 3 * blockSz); break;
 		}
 		
-		float R = imageData[(int) Math.round(3 * (texUV.x + width * texUV.y))];
-		float G = imageData[(int) Math.round(3 * (texUV.x + width * texUV.y)) + 1];
-		float B = imageData[(int) Math.round(3 * (texUV.x + width * texUV.y)) + 2];
+		int index = (int) Math.round(3 * (texUV.x + width * texUV.y));
+		if(index > imageData.length - 3) index = imageData.length - 3;
+		if(index < 0) index = 0;
+		
+		float R = imageData[index];
+		float G = imageData[index + 1];
+		float B = imageData[index + 2];
 		
 		outRadiance.set(R, G, B);
 		outRadiance.mul(scaleFactor);

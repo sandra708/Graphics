@@ -1,0 +1,50 @@
+\documentclass{letter}
+
+\usepackage{amsmath}
+
+\begin{document}
+
+Alexandra Anderson (aea84) \\
+CS 4620 \\
+Written Portion: A7-Ray
+
+1.
+
+a) Given a mug in the y direction with height 10 and radius 5, centered at the origin. Given a camera at (0, 0, 20) looking in the -z direction.
+
+We know that the environment area reflected in the mug is a smooth transition from a glancing ray on the left side of the mug to the right side, and from the top rim of the mug to its base. Thus, we calculate the angles that those four reflections cause, to delimit our area in $(\phi, \theta)$.
+
+We can calculate the right-most point that the camera sees by looking at where the view direction is orthogonal to the normal, so the ray merely grazes the mug. For an arbitrary view direction (x, 0, -1), the ray grazes the mug at the location (xt, 0, 20 - t), and that is also the normal. Thus, we know that $x^2t + t - 20 = 0$, and, because the intersection is a distance 5 from the origin, $(xt)^2 + (20 - t)^2 = 5$. Solving the first equation in terms of x gives us $x = \sqrt{\frac{20 - t}{t}}$. 
+
+Then substituting this into the second equation gives us 
+\begin{align*}
+5 &= \frac{20 - t}{t}(t^2) + (20 - t)^2 \\
+&= (20 -t)(t) + (20 - t)^2 \\
+&= (20 - t)(t + 20 - t) \\
+&= (20 - t)(20) \\
+\frac{1}{4} &= 20 - t\\
+t &= 20 - \frac{1}{4}
+\end{align*}
+
+So we substitute back into our solution for $x$ and see that 
+\begin{align*}
+x &= \sqrt{\frac{20 - (20 - \frac{1}{4})}{20 - \frac{1}{4}}} \\
+&= \sqrt{\frac{40 - 1/4}{20 - 1/4}} \\
+&= \sqrt{\frac{160 - 1}{80 - 1}} \\
+&= \sqrt{\frac{159}{79}} \\
+x &= 1.419 
+\end{align*}
+So we have the direction (1.419, 0, -1), which grazes the mug, and therefore reflects in the same direction (1.419, 0, -1). 
+
+Now the $\phi$-coordinate of this direction is 0, but the $\theta$-coordinate is $tan^-1(1.419/(-1)) = -54.8$ degrees. Given the limitations of arctan, this is equivalent to 145 degrees East of the +z meridian. 
+
+By symmetry, the smallest possible value of $\theta$ is the exact opposite, 145 degrees West of the +z meridian. 
+
+Now, finding the maximal and minimal $\phi$ values is much simpler. Since the entire mug fits into the picture, we note that the highest possible reflection is the ray which reflects off the top-most y-coordinate. Thus, the intersection is (0, 5, 0), with a viewing ray of (0, -5, 20), a normal of (0, 1, 0) and the reflection takes the direction (0, 5, 20), which normalizes to $(0, 1/\sqrt{5}, 4/\sqrt{5})$. This has polar coordinates of $\phi = cos^{-1}(y)$, where y is the normalized coordinate, and $\phi = cos^{-1}(y) = 63.43$ degrees below +y, or 26.5 degrees above the equator. 
+
+Again by symmetry, the smallest $\phi$-value is the exact opposite, so 26.5 degrees below the equator. 
+
+Therefore, the window can be placed anywhere in the intervals $\phi = (0.3528, 0.6472)$ and $\theta = (0.0972, 0.9028)$, within the total sphere from (0, 1) in both directions.
+
+
+\end{document}
